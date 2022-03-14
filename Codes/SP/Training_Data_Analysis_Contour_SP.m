@@ -140,296 +140,46 @@ save ('Spiral','Spiral'); save ('Blobs','Blobs'); save ('Squiggles','Squiggles')
 save ('Letters','Letters')
 
 %% Isolating Orientation Jitter Thresholds for each shape
+clear all
 
 % Circle 
-clear all
 load('Circle.mat')
-
-for ii = 1:size(Circle,1)
-    for jj = 1:size(Circle,2)
-        if isempty(Circle{ii,jj}) == 1
-            avg_thresh_ori = NaN;
-            Thresh_ori = NaN;
-        else
-            for kk = 1:length(Circle{ii,jj})
-                count_ori = [];
-                for mm = 4:length(Circle{ii,jj}{kk,1})                   
-                    count_ori = [count_ori ; Circle{ii,jj}{kk,1}(mm,1).orientationJitter];
-                end
-                thresh_ori = [];
-                flag_ori = 0;
-                for ll = 1:length(count_ori) - 1
-                    c = 0;
-                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 1;
-                    end
-                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 0;
-                    end
-                end
-                avg_thresh_ori = mean(thresh_ori,'omitnan');
-                Thresh_ori(kk,1) = avg_thresh_ori;
-                clear count_ori
-            end
-        end
-        Circle_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
-        clear avg_thresh_ori; clear Thresh_ori;
-    end
-end
-
+Circle_OJ_thresh = isolate_threshold(Circle);
 save('Circle_OJ_thresh','Circle_OJ_thresh');
-clear all
 
 % Lines 
-clear all
 load('Lines.mat')
-
-for ii = 1:size(Lines,1)
-    for jj = 1:size(Lines,2)
-        if isempty(Lines{ii,jj}) == 1
-            avg_thresh_ori = NaN;
-            Thresh_ori = NaN;
-        else
-            for kk = 1:length(Lines{ii,jj})
-                count_ori = [];
-                for mm = 4:length(Lines{ii,jj}{kk,1})                   
-                    count_ori = [count_ori ; Lines{ii,jj}{kk,1}(mm,1).orientationJitter];
-                end
-                thresh_ori = [];
-                flag_ori = 0;
-                for ll = 1:length(count_ori) - 1
-                    c = 0;
-                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 1;
-                    end
-                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 0;
-                    end
-                end
-                avg_thresh_ori = mean(thresh_ori,'omitnan');
-                Thresh_ori(kk,1) = avg_thresh_ori;
-                clear count_ori
-            end
-        end
-        Lines_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
-        clear avg_thresh_ori; clear Thresh_ori;
-    end
-end
-
+Lines_OJ_thresh = isolate_threshold(Lines);
 save('Lines_OJ_thresh','Lines_OJ_thresh');
-clear all
 
 % Ellipses 
-clear all
 load('Ellipses.mat')
-
-for ii = 1:size(Ellipses,1)
-    for jj = 1:size(Ellipses,2)
-        if isempty(Ellipses{ii,jj}) == 1
-            avg_thresh_ori = NaN;
-            Thresh_ori = NaN;
-        else
-            for kk = 1:length(Ellipses{ii,jj})
-                count_ori = [];
-                for mm = 4:length(Ellipses{ii,jj}{kk,1})                   
-                    count_ori = [count_ori ; Ellipses{ii,jj}{kk,1}(mm,1).orientationJitter];
-                end
-                thresh_ori = [];
-                flag_ori = 0;
-                for ll = 1:length(count_ori) - 1
-                    c = 0;
-                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 1;
-                    end
-                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 0;
-                    end
-                end
-                avg_thresh_ori = mean(thresh_ori,'omitnan');
-                Thresh_ori(kk,1) = avg_thresh_ori;
-                clear count_ori
-            end
-        end
-        Ellipses_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
-        clear avg_thresh_ori; clear Thresh_ori;
-    end
-end
-
+Ellipses_OJ_thresh = isolate_threshold(Ellipses);
 save('Ellipses_OJ_thresh','Ellipses_OJ_thresh');
-clear all
 
 % Spiral 
-clear all
 load('Spiral.mat')
-
-for ii = 1:size(Spiral,1)
-    for jj = 1:size(Spiral,2)
-        if isempty(Spiral{ii,jj}) == 1
-            avg_thresh_ori = NaN;
-            Thresh_ori = NaN;
-        else
-            for kk = 1:length(Spiral{ii,jj})
-                count_ori = [];
-                for mm = 4:length(Spiral{ii,jj}{kk,1})                   
-                    count_ori = [count_ori ; Spiral{ii,jj}{kk,1}(mm,1).orientationJitter];
-                end
-                thresh_ori = [];
-                flag_ori = 0;
-                for ll = 1:length(count_ori) - 1
-                    c = 0;
-                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 1;
-                    end
-                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 0;
-                    end
-                end
-                avg_thresh_ori = mean(thresh_ori,'omitnan');
-                Thresh_ori(kk,1) = avg_thresh_ori;
-                clear count_ori
-            end
-        end
-        Spiral_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
-        clear avg_thresh_ori; clear Thresh_ori;
-    end
-end
-
+Spiral_OJ_thresh = isolate_threshold(Spiral);
 save('Spiral_OJ_thresh','Spiral_OJ_thresh');
-clear all
 
 % Blobs 
-clear all
 load('Blobs.mat')
-
-for ii = 1:size(Blobs,1)
-    for jj = 1:size(Blobs,2)
-        if isempty(Blobs{ii,jj}) == 1
-            avg_thresh_ori = NaN;
-            Thresh_ori = NaN;
-        else
-            for kk = 1:length(Blobs{ii,jj})
-                count_ori = [];
-                for mm = 4:length(Blobs{ii,jj}{kk,1})                   
-                    count_ori = [count_ori ; Blobs{ii,jj}{kk,1}(mm,1).orientationJitter];
-                end
-                thresh_ori = [];
-                flag_ori = 0;
-                for ll = 1:length(count_ori) - 1
-                    c = 0;
-                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 1;
-                    end
-                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 0;
-                    end
-                end
-                avg_thresh_ori = mean(thresh_ori,'omitnan');
-                Thresh_ori(kk,1) = avg_thresh_ori;
-                clear count_ori
-            end
-        end
-        Blobs_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
-        clear avg_thresh_ori; clear Thresh_ori;
-    end
-end
-
+Blobs_OJ_thresh = isolate_threshold(Blobs);
 save('Blobs_OJ_thresh','Blobs_OJ_thresh');
-clear all
 
 % Squiggles
-clear all
 load('Squiggles.mat')
-
-for ii = 1:size(Squiggles,1)
-    for jj = 1:size(Squiggles,2)
-        if isempty(Squiggles{ii,jj}) == 1
-            avg_thresh_ori = NaN;
-            Thresh_ori = NaN;
-        else
-            for kk = 1:length(Squiggles{ii,jj})
-                count_ori = [];
-                for mm = 4:length(Squiggles{ii,jj}{kk,1})                   
-                    count_ori = [count_ori ; Squiggles{ii,jj}{kk,1}(mm,1).orientationJitter];
-                end
-                thresh_ori = [];
-                flag_ori = 0;
-                for ll = 1:length(count_ori) - 1
-                    c = 0;
-                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 1;
-                    end
-                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 0;
-                    end
-                end
-                avg_thresh_ori = mean(thresh_ori,'omitnan');
-                Thresh_ori(kk,1) = avg_thresh_ori;
-                clear count_ori
-            end
-        end
-        Squiggles_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
-        clear avg_thresh_ori; clear Thresh_ori;
-    end
-end
-
+Squiggles_OJ_thresh = isolate_threshold(Squiggles);
 save('Squiggles_OJ_thresh','Squiggles_OJ_thresh');
-clear all
 
 % Letters
-clear all
 load('Letters.mat')
-
-for ii = 1:size(Letters,1)
-    for jj = 1:size(Letters,2)
-        if isempty(Letters{ii,jj}) == 1
-            avg_thresh_ori = NaN;
-            Thresh_ori = NaN;
-        else
-            for kk = 1:length(Letters{ii,jj})
-                count_ori = [];
-                for mm = 4:length(Letters{ii,jj}{kk,1})                   
-                    count_ori = [count_ori ; Letters{ii,jj}{kk,1}(mm,1).orientationJitter];
-                end
-                thresh_ori = [];
-                flag_ori = 0;
-                for ll = 1:length(count_ori) - 1
-                    c = 0;
-                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 1;
-                    end
-                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
-                        thresh_ori = [thresh_ori ; count_ori(ll)];
-                        flag_ori = 0;
-                    end
-                end
-                avg_thresh_ori = mean(thresh_ori,'omitnan');
-                Thresh_ori(kk,1) = avg_thresh_ori;
-                clear count_ori
-            end
-        end
-        Letters_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
-        clear avg_thresh_ori; clear Thresh_ori;
-    end
-end
-
+Letters_OJ_thresh = isolate_threshold(Letters);
 save('Letters_OJ_thresh','Letters_OJ_thresh');
-clear all
 
 %% Calculating the average performance for a Contour Shape - Orientation Jitter
 
+clear all
 % Circle
 
 load('Circle_OJ_thresh.mat');

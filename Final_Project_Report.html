@@ -215,6 +215,84 @@ end</code></pre>
 <div id="step-2-aggregating-data-for-all-participants-across-all-sessions" class="section level3">
 <h3>Step 2: Aggregating data for all participants across all sessions</h3>
 <p>The next step would be to create an aggregated data file that pools in the logs for all participants and each session. The code block below does this in matlab and stores 2 files</p>
+<p>Previously, I used a hard coded format to do this as shown below:</p>
+<pre><code>% OLD CODE
+
+part = [1005, 1018, 1028, 1005, 1018, 1002, 1012, 1016, 1002, 1016, 1017];
+for p = 1:length(part)
+    for i = 0:39
+        for j = 0:1
+            if  p &lt; 4
+                if i &lt; 10
+                    fname = ([&#39;CA&#39; num2str(part(p)) &#39;A_00&#39; num2str(i) &#39;_000_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                    val = jsondecode(fileread(fname));
+                    Data_SP_40{p}{i+1,j+1} = val.data;
+                else
+                    fname = ([&#39;CA&#39; num2str(part(p)) &#39;A_0&#39; num2str(i) &#39;_000_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                    val = jsondecode(fileread(fname));
+                    Data_SP_40{p}{i+1,j+1} = val.data;
+                end
+            else if p == 4
+                    if i &lt; 10
+                        fname = ([&#39;Na&#39; num2str(part(p)) &#39;A_00&#39; num2str(i) &#39;_000_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                        val = jsondecode(fileread(fname));
+                        Data_SP_40{p}{i+1,j+1} = val.data;
+                    else
+                        fname = ([&#39;Na&#39; num2str(part(p)) &#39;A_0&#39; num2str(i) &#39;_000_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                        val = jsondecode(fileread(fname));
+                        Data_SP_40{p}{i+1,j+1} = val.data;
+                    end
+                else if p == 5
+                        if i &lt; 10
+                            fname = ([&#39;NA&#39; num2str(part(p)) &#39;A_00&#39; num2str(i) &#39;_000_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                            val = jsondecode(fileread(fname));
+                            Data_SP_40{p}{i+1,j+1} = val.data;
+                        else
+                            fname = ([&#39;NA&#39; num2str(part(p)) &#39;A_0&#39; num2str(i) &#39;_000_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                            val = jsondecode(fileread(fname));
+                            Data_SP_40{p}{i+1,j+1} = val.data;
+                        end
+                    else if (p &gt; 6 &amp;&amp; p &lt; 9)
+                            if i &lt; 10
+                                
+                                fname = ([&#39;CA&#39; num2str(part(p)) &#39;A_00&#39; num2str(i) &#39;_002_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                                val = jsondecode(fileread(fname));
+                                Data_SP_40{p}{i+1,j+1} = val.data;
+                            else
+                                
+                                fname = ([&#39;CA&#39; num2str(part(p)) &#39;A_0&#39; num2str(i) &#39;_002_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                                val = jsondecode(fileread(fname));
+                                Data_SP_40{p}{i+1,j+1} = val.data;
+                            end
+                        else if p == 6
+                                if i &lt; 10
+                                    fname = ([&#39;CA&#39; num2str(part(p)) &#39;B_00&#39; num2str(i) &#39;_002_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                                    val = jsondecode(fileread(fname));
+                                    Data_SP_40{p}{i+1,j+1} = val.data;
+                                else
+                                    fname = ([&#39;CA&#39; num2str(part(p)) &#39;B_0&#39; num2str(i) &#39;_002_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                                    val = jsondecode(fileread(fname));
+                                    Data_SP_40{p}{i+1,j+1} = val.data;
+                                end
+                            else
+                                if i &lt; 10
+                                    fname = ([&#39;NA&#39; num2str(part(p)) &#39;A_00&#39; num2str(i) &#39;_002_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                                    val = jsondecode(fileread(fname));
+                                    Data_SP_40{p}{i+1,j+1} = val.data;
+                                else
+                                    fname = ([&#39;NA&#39; num2str(part(p)) &#39;A_0&#39; num2str(i) &#39;_002_00&#39; num2str(j) &#39;_ContourLog.json&#39;]);
+                                    val = jsondecode(fileread(fname));
+                                    Data_SP_40{p}{i+1,j+1} = val.data;
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end</code></pre>
+<p><strong>This has now been optimized as follows: </strong></p>
 <ol style="list-style-type: decimal">
 <li>Data log aggregate for all SP named as <code>SP_Data.mat</code></li>
 <li>Data log aggregate for the summary file for each session and participant named as <code>SP_summary.mat</code></li>
@@ -252,35 +330,6 @@ for i = 1:length(files)
     end
 end
 save(&#39;SP_data&#39;, &#39;SP&#39;)</code></pre>
-<pre><code>%% For aggregating summary files of each participant
-
-files = dir(&#39;*.json&#39;);
-count = 1;
-part_cmp = &#39;CA1005A&#39;;
-for i = 1:length(files)
-    [~,names] = fileparts(files(i).name);
-    cmp_name = names(end-6:end);
-    log_name = &#39;Summary&#39;;
-    part_name = names(1:7);
-    ses_name = names(10:11);
-    ses = str2double(regexp(ses_name,&#39;\d*&#39;,&#39;match&#39;));
-    if sum(part_name ~= part_cmp) &gt; 0
-        count = count + 1;
-        part_cmp = part_name;
-        if cmp_name == log_name
-            fname = (files(i).name);
-            val = jsondecode(fileread(fname));
-            SP{count,ses+1}{1,run+1} = val.data;
-        end
-    else
-            if (cmp_name == log_name)
-                fname = (files(i).name);
-                val = jsondecode(fileread(fname));
-                SP_summary{count,ses+1} = val.data;
-            end
-    end
-end
-save(&#39;SP_summary&#39;, &#39;SP_summary&#39;)</code></pre>
 <p>A similar method was used to create two aggregate matrices for NT group as well. They were named <code>NT_data.mat</code> and <code>NT_summary.mat</code></p>
 </div>
 <div id="step-3-isolating-data-for-each-contour-shape-for-all-participants-across-all-sessions" class="section level3">
@@ -402,7 +451,35 @@ writetable(OJ,&#39;OJ.csv&#39;);</code></pre>
 </div>
 <div id="step-6-data-visualization" class="section level3">
 <h3>Step 6: Data Visualization</h3>
-<p>Bar graphs were used to visualize the family-wise threshold data for both SP and NT groups separately and also compared with each other. The following code generates a graph denoting the <strong>Family - wise Average OJ thresholds for SP and NT groups</strong></p>
+<p>Previously, I was visualizing the data in MATLAB that used long lines of code to generate a simple bar graph as follows:</p>
+<pre><code>x = 1:7
+y = [SP_count_thresh, NT_count_thresh];
+err = [SP_count_win_se, NT_count_win_se];
+b = bar(y,&#39;grouped&#39;);
+hold on
+% Find the number of groups and the number of bars in each group
+[ngroups, nbars] = size(y);
+% Calculate the width for each bar group
+groupwidth = min(0.8, nbars/(nbars + 1.5));
+% Set the position of each error bar in the centre of the main bar
+% Based on barweb.m by Bolu Ajiboye from MATLAB File Exchange
+for i = 1:nbars
+    % Calculate center of each bar
+    x = (1:ngroups) - groupwidth/2 + (2*i-1) * groupwidth / (2*nbars);
+    errorbar(x, y(:,i), err(:,i), &#39;k&#39;, &#39;linestyle&#39;, &#39;none&#39;);
+end
+hold off
+
+set(gca,&#39;xtick&#39;,x_id,&#39;xticklabel&#39;,names,&#39;fontsize&#39;,19)
+xtickangle(45)
+xlim([0 7])
+xlabel(&#39;Contour Shapes&#39;,&#39;fontsize&#39;,26);
+ylabel(&#39;Inducer Number Thresholds&#39;,&#39;fontsize&#39;,26);
+grid on;
+title(&#39;Inducer Number Thresholds for SP and NT&#39;,&#39;fontsize&#39;,28)
+legend(&#39;SP&#39;,&#39;NT&#39;, &#39;location&#39;,&#39;northeast&#39;)</code></pre>
+<p>R studio optimizes plotting and visualization of data to generate concise graphs that are visually pleasant and very time efficient.</p>
+<p>Here, I plot Bar graphs to visualize the family-wise threshold data for both SP and NT groups separately and also compared with each other. The following R code generates a graph denoting the <strong>Family - wise Average OJ thresholds for SP and NT groups</strong></p>
 <pre class="r"><code>OJ &lt;- read_csv(&#39;OJ.csv&#39;)
 
 # Plotting graph for all Contour Shapes
