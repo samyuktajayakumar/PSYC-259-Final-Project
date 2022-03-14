@@ -1,0 +1,85 @@
+{
+  "meta_data": {
+    "additional_headers": {
+      "ProtocolSet": "",
+      "ProtocolID": 7
+    },
+    "game_name": "VisionGame",
+    "version": "0.7.2",
+    "user_name": "CA1006D",
+    "organization": "braingamecenter",
+    "study": "RA_2018_10",
+    "session_number": 1,
+    "device_id": "D0B975EF-9219-4004-B2D3-7B19359FA20F"
+  },
+  "data": [
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 0,
+      "contour_mode": "ContourPreTest",
+      "contour_class": "Circle_General",
+      "contour_regen": "None",
+      "contour_parameter": "OrientationJitter",
+      "time": 1571765116471.71
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 1,
+      "contour_mode": "ContourPreTest",
+      "contour_class": "Circle_General",
+      "contour_regen": "None",
+      "contour_parameter": "Count",
+      "time": 1571765250132.53
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 2,
+      "contour_mode": "ContourTask",
+      "contour_class": "Circle_General",
+      "contour_regen": "None",
+      "contour_parameter": "OrientationJitter",
+      "time": 1571765401611.8
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 3,
+      "contour_mode": "ContourTask",
+      "contour_class": "Circle_General",
+      "contour_regen": "None",
+      "contour_parameter": "Count",
+      "time": 1571765538618.31
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 4,
+      "contour_mode": "ContourTask",
+      "contour_class": "Line_V",
+      "contour_regen": "None",
+      "contour_parameter": "OrientationJitter",
+      "time": 1571765805988.72
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 5,
+      "contour_mode": "ContourPostTest",
+      "contour_class": "Ellipse_V_Fixed",
+      "contour_regen": "None",
+      "contour_parameter": "OrientationJitter",
+      "time": 1571765938169.48
+    },
+    {
+      "game_type": "Score",
+      "game_mode": "Contour",
+      "medal": "Bronze",
+      "level": 1,
+      "score": 2,
+      "time": 1571766100842.23
+    }
+  ]
+}

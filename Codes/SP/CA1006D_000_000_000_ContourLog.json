@@ -1,0 +1,98 @@
+{
+  "meta_data": {
+    "additional_headers": {},
+    "game_name": "VisionGame",
+    "version": "0.7.2",
+    "user_name": "CA1006D",
+    "organization": "braingamecenter",
+    "study": "RA_2018_10",
+    "session_number": 0,
+    "device_id": "D0B975EF-9219-4004-B2D3-7B19359FA20F"
+  },
+  "data": [
+    {
+      "trial": 0,
+      "type": "Target",
+      "inducers": 26,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1532,
+      "y": 160,
+      "w": 540,
+      "h": 540,
+      "spawn_time": 1571681690112.74
+    },
+    {
+      "trial": 1,
+      "type": "Target",
+      "inducers": 26,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 984,
+      "y": 1164,
+      "w": 540,
+      "h": 540,
+      "spawn_time": 1571681693148.23
+    },
+    {
+      "trial": 2,
+      "type": "Target",
+      "inducers": 26,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1096,
+      "y": 844,
+      "w": 540,
+      "h": 540,
+      "spawn_time": 1571681695908.18
+    },
+    {
+      "trial": 3,
+      "type": "Target",
+      "inducers": 26,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 224,
+      "y": 1296,
+      "w": 540,
+      "h": 540,
+      "spawn_time": 1571681698476.1
+    },
+    {
+      "trial": 4,
+      "type": "Target",
+      "inducers": 26,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 848,
+      "y": 476,
+      "w": 540,
+      "h": 540,
+      "spawn_time": 1571681702270.09
+    },
+    {
+      "trial": 5,
+      "type": "Target",
+      "inducers": 26,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1844,
+      "y": 1136,
+      "w": 540,
+      "h": 540,
+      "spawn_time": 1571681704771.38
+    },
+    {
+      "trial": 6,
+      "type": "Target",
+      "inducers": 26,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1648,
+      "y": 296,
+      "w": 540,
+      "h": 540,
+      "spawn_time": 1571681707398.06
+    }
+  ]
+}

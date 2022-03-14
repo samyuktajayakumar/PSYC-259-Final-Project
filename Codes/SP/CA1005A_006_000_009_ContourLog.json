@@ -1,0 +1,144 @@
+{
+  "meta_data": {
+    "additional_headers": {},
+    "game_name": "VisionGame",
+    "version": "0.4.0",
+    "user_name": "CA1005A",
+    "device_id": "774D3BD2-492E-4C21-9D40-7442ACE1F702",
+    "session_number": 6
+  },
+  "data": [
+    {
+      "trial": 0,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1792,
+      "y": 852,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278825644.5
+    },
+    {
+      "trial": 1,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1916,
+      "y": 1184,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278836659.77
+    },
+    {
+      "trial": 2,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 804,
+      "y": 804,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278847669.99
+    },
+    {
+      "trial": 3,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 2004,
+      "y": 288,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278858680.37
+    },
+    {
+      "trial": 4,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1132,
+      "y": 196,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278868784.01
+    },
+    {
+      "trial": 5,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1376,
+      "y": 256,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278879796.57
+    },
+    {
+      "trial": 6,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1480,
+      "y": 1260,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278890811.35
+    },
+    {
+      "trial": 7,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1504,
+      "y": 936,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278901827
+    },
+    {
+      "trial": 8,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1296,
+      "y": 216,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278912841
+    },
+    {
+      "trial": 9,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 508,
+      "y": 908,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278923852.34
+    },
+    {
+      "trial": 10,
+      "type": "Target",
+      "inducers": 16,
+      "orientationJitter": 0,
+      "spatialJitter": 0,
+      "x": 1216,
+      "y": 984,
+      "w": 556,
+      "h": 556,
+      "spawn_time": 1551278934860.16
+    }
+  ]
+}

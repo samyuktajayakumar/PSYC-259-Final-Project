@@ -1,0 +1,40 @@
+---
+title: 'PSYC 259: Final Project'
+author: "Samyukta Jayakumar"
+date: "3/13/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Brief Overview
+
+The study focuses on understanding the effect of different properties of shapes on a Contour integration paradigm in patients with Schizophrenia and Neurotypical individuals. Contour integration is the process of identifying shapes made of disjoint but coherent and collinear elements from background elements that are similar in nature (noise). The study was administered using an iPad at three different sites: 
+
+* Nathan Kline Institute (NKI) 
+* Weill Cornell Medicine (CA) 
+* University of California, Riverside (UCR)
+
+A total of 24 patients with Schizophrenia (SP) and 15 Neurotypical individuals (NT) were recruited for the study. 
+
+## Experimental Design
+
+All participants underwent training for 40 sessions with SP performing one session per day and NT performing two sessions per day. All participants were trained on 15 different shapes, classified into 7 families of shapes, throughout their training period and the order of presentation of shapes was conserved between both the groups. Two parameters (Orientation jitter and inducer number) were manipulated during the training period using a combination of streaking and adaptive 3 down/1 up staircase method. This controlled the difficulty of training during each session. 
+
+The figure depicts some of the shapes presented during the study
+
+![Fig 1: Subset of Contour Shapes presented during Training](images/Contour_Shapes.png)
+
+## Analyses
+
+For the purpose of the current project no training/learning effects were evaluated and only the performance of both groups on different shapes were assessed. In order to do this, thresholds were calculated as the average of all the reversal values over all blocks and all sessions for a particular shape that was presented to the participant. These thresholds were observed at both the orientation jitter and the inducer number level. Graphs were then plotted to see which group performed better and on which shape. 
+
+Several steps were involved in cleaning of data files before the data could be processed and visualized. MATALB 2020b software was used to perform data cleaning and analysis and the final plots were then visualized using the RStudio 2021.09.1 software.
+
+**Note:** For purpose of efficiently sharing the data on Github, I've added only the relevant data files from 5 SP and 5 NT participants and will be performing analyses only using these files. 
+
+### Step 1:
+
+

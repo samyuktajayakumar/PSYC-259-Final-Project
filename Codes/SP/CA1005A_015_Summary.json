@@ -1,0 +1,125 @@
+{
+  "meta_data": {
+    "additional_headers": {
+      "ProtocolSet": "",
+      "ProtocolID": 7
+    },
+    "game_name": "VisionGame",
+    "version": "0.5.0",
+    "user_name": "CA1005A",
+    "organization": "braingamecenter",
+    "study": "RA_2018_10",
+    "session_number": 15,
+    "device_id": "774D3BD2-492E-4C21-9D40-7442ACE1F702"
+  },
+  "data": [
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 0,
+      "contour_mode": "ContourPreTest",
+      "contour_class": "Circle_General",
+      "contour_regen": "None",
+      "contour_parameter": "OrientationJitter",
+      "time": 1552654883541.95
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 1,
+      "contour_mode": "ContourPreTest",
+      "contour_class": "Circle_General",
+      "contour_regen": "None",
+      "contour_parameter": "Count",
+      "time": 1552655010424.07
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 2,
+      "contour_mode": "ContourTask",
+      "contour_class": "Letter_P",
+      "contour_regen": "None",
+      "contour_parameter": "OrientationJitter",
+      "time": 1552655136500.82
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 3,
+      "contour_mode": "ContourTask",
+      "contour_class": "Letter_P",
+      "contour_regen": "None",
+      "contour_parameter": "Count",
+      "time": 1552655261248.27
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 4,
+      "contour_mode": "ContourTask",
+      "contour_class": "Letter_D",
+      "contour_regen": "None",
+      "contour_parameter": "OrientationJitter",
+      "time": 1552655387439.33
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 5,
+      "contour_mode": "ContourTask",
+      "contour_class": "Letter_D",
+      "contour_regen": "None",
+      "contour_parameter": "Count",
+      "time": 1552655511044.31
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 6,
+      "contour_mode": "ContourTask",
+      "contour_class": "Letter_B",
+      "contour_regen": "None",
+      "contour_parameter": "OrientationJitter",
+      "time": 1552655635008.28
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 7,
+      "contour_mode": "ContourTask",
+      "contour_class": "Letter_B",
+      "contour_regen": "None",
+      "contour_parameter": "Count",
+      "time": 1552655762740.48
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 8,
+      "contour_mode": "ContourTask",
+      "contour_class": "Letter_Q",
+      "contour_regen": "None",
+      "contour_parameter": "OrientationJitter",
+      "time": 1552655886515.69
+    },
+    {
+      "game_type": "Contour",
+      "element": 0,
+      "run": 9,
+      "contour_mode": "ContourPostTest",
+      "contour_class": "Blob_1",
+      "contour_regen": "Orientation",
+      "contour_parameter": "OrientationJitter",
+      "time": 1552656011364.07
+    },
+    {
+      "game_type": "Score",
+      "game_mode": "Contour",
+      "medal": "Bronze",
+      "level": 4,
+      "score": 30,
+      "time": 1552656154431.18
+    }
+  ]
+}
