@@ -1,63 +1,45 @@
-%% Contour Training data Analysis - Distractor information
-
+%% Analysing Training Data - Contour Data
 clear all
 close all
 clc
 
 %% Looping through every file in the directory - Individual and Summary
 
-files = dir('*.json');
+files = dir('*.json'); % Identifies all .json files from the directory
 count = 1;
-part_cmp = 'STS1005';
-count_odd = 0;
+part_cmp = 'CA1005A'; % Reference participant # to begin the loop
 for i = 1:length(files)
     [~,names] = fileparts(files(i).name);
     cmp_name = names(end-9:end);
-    log_name = 'ContourLog';
-    part_name = names(1:7);
-    ses_name = names(10:11);
-    block_name = names(15);
-    run_name = names(18:19);
+    log_name = 'ContourLog'; % Isolates the log file name
+    part_name = names(1:7);  % Isolates the participant name
+    ses_name = names(10:11); % Isolates the session #
+    run_name = names(18:19); % Isolates the run #
     ses = str2double(regexp(ses_name,'\d*','match'));
     run = str2double(regexp(run_name,'\d*','match'));
-    block = str2double(regexp(block_name,'\d*','match'));
-    if sum(part_name ~= part_cmp) > 0
+    if sum(part_name ~= part_cmp) > 0 % Comparing strings
         count = count + 1;
         part_cmp = part_name;
-        count_odd = 0;
         if cmp_name == log_name
-            if block == 0
-                count_odd = ses + 1;
-                fname = (files(i).name);
-                val = jsondecode(fileread(fname));
-                NT{count,ses+count_odd}{1,run+1} = val.data;
-            else
-                fname = (files(i).name);
-                val = jsondecode(fileread(fname));
-                NT{count,(ses+1)*2}{1,run+1} = val.data;
-            end
+            fname = (files(i).name);
+            val = jsondecode(fileread(fname));
+            SP{count,ses+1}{1,run+1} = val.data; % Enters participants as rows and sessions as columns in a cell format
         end
     else
         if cmp_name == log_name
-            if block == 0
-                count_odd = ses + 1;
-                fname = (files(i).name);
-                val = jsondecode(fileread(fname));
-                NT{count,ses+count_odd}{1,run+1} = val.data;
-            else
-                fname = (files(i).name);
-                val = jsondecode(fileread(fname));
-                NT{count,(ses+1)*2}{1,run+1} = val.data;
-            end
+            fname = (files(i).name);
+            val = jsondecode(fileread(fname));
+            SP{count,ses+1}{1,run+1} = val.data;
         end
     end
 end
+save('SP_data', 'SP')
 
-save('NT_data', 'NT')
+% Summary Files
 
 files = dir('*.json');
 count = 1;
-part_cmp = 'STS1005';
+part_cmp = 'CA1005A';
 for i = 1:length(files)
     [~,names] = fileparts(files(i).name);
     cmp_name = names(end-6:end);
@@ -71,69 +53,20 @@ for i = 1:length(files)
         if cmp_name == log_name
             fname = (files(i).name);
             val = jsondecode(fileread(fname));
-            NT{count,ses+1}{1,run+1} = val.data;
+            SP{count,ses+1}{1,run+1} = val.data;
         end
     else
             if (cmp_name == log_name)
                 fname = (files(i).name);
                 val = jsondecode(fileread(fname));
-                NT_summary{count,ses+1} = val.data;
+                SP_summary{count,ses+1} = val.data;
             end
     end
 end
+save('SP_summary', 'SP_summary')
 
-% Organising the Summary file to account for 20 training sessions
 
-Contour = 'Contour';
-for i = 1:size(NT_summary,1)
-    for j = 1:size(NT_summary,2)
-        if i == 13 && j == 8
-            continue;
-        else
-            if ~isempty(NT_summary{i,j})
-                count = 0;
-                for k = 1:length(NT_summary{i,j})                    
-                    fields = fieldnames(NT_summary{i,j}{k,1});
-                    if contains(NT_summary{i,j}{k,1}.game_type, 'Contour')
-                        if NT_summary{i,j}{k,1}.element == 0
-                            dummy0{i,j}{k,1} = NT_summary{i,j}{k,1};
-                        else
-                            dummy2{i,j}{k,1} = NT_summary{i,j}{k,1};
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
-% Removing empty cells from the dummy2 matrices
-for i = 1:size(NT_summary,1)
-    for j = 1:size(NT_summary,2)
-        if ~isempty(dummy2{i,j})
-            bla = dummy2{i,j};
-            bla = bla(~cellfun('isempty', bla));
-            dummy2{i,j} = bla;
-        end
-    end
-end
-odd = 1:20;
-even = 1:20;
-count1 = 0:0.5:9;
-for i = 1:size(dummy0,1)
-    for j = 1:20 %size(dummy0,2)
-        if mod(j,2) ~= 0
-            NT_summary2{i,odd(j)} = dummy0{i,j-count1(j)};  
-        else
-            NT_summary2{i,even(j)} = dummy2{i,j/2};
-        end
-    end
-end
-
-NT_summary = NT_summary2;
-save('NT_summary','NT_summary');
-
-%% Isolating data contour class - wise
+%% Isolating data for Families of Contour shapes
 
 Contour = 'Contour'; % Task name
 contour_class = 'contour_class'; % Class of task name
@@ -156,8 +89,8 @@ Letter_B = "Letter_B"; % Task coded name for Letter shape 1
 Letter_D = "Letter_D"; % Task coded name for Letter shape 2
 Letter_P = "Letter_P"; % Task coded name for Letter shape 3
 
-for i = 1:size(NT,1) % For each participant
-    for j = 1:size(NT,2) % For each session
+for i = 1:size(SP,1) % For each participant
+    for j = 1:size(SP,2) % For each session
         % Setting counters for each Family
         count1 = 0;
         count2 = 0;
@@ -166,33 +99,33 @@ for i = 1:size(NT,1) % For each participant
         count5 = 0;
         count6 = 0;
         count7 = 0;
-        if ~isempty(NT_summary{i,j})
-            for k = 1:length(NT_summary{i,j})
-                if contains(NT_summary{i,j}{k,1}.game_type, Contour)
-                    if contains(NT_summary{i,j}{k,1}.contour_parameter, OrientationJitter)
-                        run = NT_summary{i,j}{k,1}.run + 1;
-                        if strcmp(NT_summary{i,j}{k,1}.contour_class, Circle_General) % Comparing strings within the summary file to isolate runs when Circle shape was presented
+        if ~isempty(SP_summary{i,j})
+            for k = 1:length(SP_summary{i,j})
+                if contains(SP_summary{i,j}{k,1}.game_type, Contour)
+                    if contains(SP_summary{i,j}{k,1}.contour_parameter, InducerNumber)
+                        run = SP_summary{i,j}{k,1}.run + 1;
+                        if strcmp(SP_summary{i,j}{k,1}.contour_class, Circle_General) % Comparing strings within the summary file to isolate runs when Circle shape was presented
                             count1 = count1 + 1;
-                            Circle{i,j}{count1,1} = NT{i,j}{1,run};
-                        elseif strcmp(NT_summary{i,j}{k,1}.contour_class, Line_V) || strcmp(NT_summary{i,j}{k,1}.contour_class, Line_H)
+                            Circle{i,j}{count1,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Line_V) || strcmp(SP_summary{i,j}{k,1}.contour_class, Line_H)
                             count2 = count2 + 1;
-                            Lines{i,j}{count2,1} = NT{i,j}{1,run};
-                        elseif strcmp(NT_summary{i,j}{k,1}.contour_class, Ellipse_V) || strcmp(NT_summary{i,j}{k,1}.contour_class, Ellipse_H) || strcmp(NT_summary{i,j}{k,1}.contour_class, Ellipse_R)
+                            Lines{i,j}{count2,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Ellipse_V) || strcmp(SP_summary{i,j}{k,1}.contour_class, Ellipse_H) || strcmp(SP_summary{i,j}{k,1}.contour_class, Ellipse_R)
                             count3 = count3 + 1;
-                            Ellipses{i,j}{count3,1} = NT{i,j}{1,run};
-                        elseif strcmp(NT_summary{i,j}{k,1}.contour_class, Spiral_General)
+                            Ellipses{i,j}{count3,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Spiral_General)
                             count4 = count4 + 1;
-                            Spiral{i,j}{count4,1} = NT{i,j}{1,run};
-                        elseif strcmp(NT_summary{i,j}{k,1}.contour_class, Blob_1) || strcmp(NT_summary{i,j}{k,1}.contour_class, Blob_2) || strcmp(NT_summary{i,j}{k,1}.contour_class, Blob_3)
+                            Spiral{i,j}{count4,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Blob_1) || strcmp(SP_summary{i,j}{k,1}.contour_class, Blob_2) || strcmp(SP_summary{i,j}{k,1}.contour_class, Blob_3)
                             count5 = count5 + 1;
-                            Blobs{i,j}{count5,1} = NT{i,j}{1,run};
-                        elseif strcmp(NT_summary{i,j}{k,1}.contour_class, Squiggle_V) || strcmp(NT_summary{i,j}{k,1}.contour_class, Squiggle_H)
+                            Blobs{i,j}{count5,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Squiggle_V) || strcmp(SP_summary{i,j}{k,1}.contour_class, Squiggle_H)
                             count6 = count6 + 1;
-                            Squiggles{i,j}{count6,1} = NT{i,j}{1,run};
+                            Squiggles{i,j}{count6,1} = SP{i,j}{1,run};
                         else
-                            if strcmp(NT_summary{i,j}{k,1}.contour_class, Letter_B) || strcmp(NT_summary{i,j}{k,1}.contour_class, Letter_D) || strcmp(NT_summary{i,j}{k,1}.contour_class, Letter_P)
+                            if strcmp(SP_summary{i,j}{k,1}.contour_class, Letter_B) || strcmp(SP_summary{i,j}{k,1}.contour_class, Letter_D) || strcmp(SP_summary{i,j}{k,1}.contour_class, Letter_P)
                                 count7 = count7 + 1;
-                                Letters{i,j}{count7,1} = NT{i,j}{1,run};
+                                Letters{i,j}{count7,1} = SP{i,j}{1,run};
                             end
                         end
                     end
@@ -204,7 +137,7 @@ end
 
 save ('Circle','Circle'); save ('Lines','Lines'); save ('Ellipses','Ellipses'); 
 save ('Spiral','Spiral'); save ('Blobs','Blobs'); save ('Squiggles','Squiggles');
-save ('Letters','Letters');
+save ('Letters','Letters')
 
 %% Isolating Orientation Jitter Thresholds for each shape
 
@@ -506,8 +439,7 @@ Circle_OJ_thresh_final = nanmean(Circle_OJ_pmeans);
 Circle_win_se_val = Circle_OJ_pmeans - Circle_OJ_thresh_final;
 Circle_win_sd = nanstd(Circle_win_se_val);
 Circle_OJ_win_se = Circle_win_sd./(size(Circle_OJ_pmeans(~isnan(Circle_OJ_pmeans)),1) ^ (1/2));
-Circle_NT = [Circle_OJ_pmeans; Circle_OJ_thresh_final;Circle_OJ_win_se];
-save('/Users/samyuktajayakumar/Sightseeing Dropbox/Samyukta Jayakumar/Mac/Desktop/Winter_2022_Course_Materials/PSYC 259/Final Project/PSYC-259-Final-Project/Codes/SP/Circle_NT','Circle_NT');
+Circle_SP = [Circle_OJ_pmeans; Circle_OJ_thresh_final;Circle_OJ_win_se];
 
 % Lines
 
@@ -518,8 +450,7 @@ Lines_OJ_thresh_final = nanmean(Lines_OJ_pmeans);
 Lines_win_se_val = Lines_OJ_pmeans - Lines_OJ_thresh_final;
 Lines_win_sd = nanstd(Lines_win_se_val);
 Lines_OJ_win_se = Lines_win_sd./(size(Lines_OJ_pmeans(~isnan(Lines_OJ_pmeans)),1) ^ (1/2));
-Lines_NT = [Lines_OJ_pmeans; Lines_OJ_thresh_final;Lines_OJ_win_se];
-save('/Users/samyuktajayakumar/Sightseeing Dropbox/Samyukta Jayakumar/Mac/Desktop/Winter_2022_Course_Materials/PSYC 259/Final Project/PSYC-259-Final-Project/Codes/SP/Lines_NT','Lines_NT');
+Lines_SP = [Lines_OJ_pmeans; Lines_OJ_thresh_final;Lines_OJ_win_se];
 
 % Ellipses
 
@@ -530,8 +461,7 @@ Ellipses_OJ_thresh_final = nanmean(Ellipses_OJ_pmeans);
 Ellipses_win_se_val = Ellipses_OJ_pmeans - Ellipses_OJ_thresh_final;
 Ellipses_win_sd = nanstd(Ellipses_win_se_val);
 Ellipses_OJ_win_se = Ellipses_win_sd./(size(Ellipses_OJ_pmeans(~isnan(Ellipses_OJ_pmeans)),1) ^ (1/2));
-Ellipses_NT = [Ellipses_OJ_pmeans; Ellipses_OJ_thresh_final;Ellipses_OJ_win_se];
-save('/Users/samyuktajayakumar/Sightseeing Dropbox/Samyukta Jayakumar/Mac/Desktop/Winter_2022_Course_Materials/PSYC 259/Final Project/PSYC-259-Final-Project/Codes/SP/Ellipses_NT','Ellipses_NT');
+Ellipses_SP = [Ellipses_OJ_pmeans; Ellipses_OJ_thresh_final;Ellipses_OJ_win_se];
 
 % Spiral
 
@@ -542,8 +472,7 @@ Spiral_OJ_thresh_final = nanmean(Spiral_OJ_pmeans);
 Spiral_win_se_val = Spiral_OJ_pmeans - Spiral_OJ_thresh_final;
 Spiral_win_sd = nanstd(Spiral_win_se_val);
 Spiral_OJ_win_se = Spiral_win_sd./(size(Spiral_OJ_pmeans(~isnan(Spiral_OJ_pmeans)),1) ^ (1/2));
-Spiral_NT = [Spiral_OJ_pmeans; Spiral_OJ_thresh_final;Spiral_OJ_win_se];
-save('/Users/samyuktajayakumar/Sightseeing Dropbox/Samyukta Jayakumar/Mac/Desktop/Winter_2022_Course_Materials/PSYC 259/Final Project/PSYC-259-Final-Project/Codes/SP/Spiral_NT','Spiral_NT');
+Spiral_SP = [Spiral_OJ_pmeans; Spiral_OJ_thresh_final;Spiral_OJ_win_se];
 
 % Blobs
 
@@ -554,8 +483,7 @@ Blobs_OJ_thresh_final = nanmean(Blobs_OJ_pmeans);
 Blobs_win_se_val = Blobs_OJ_pmeans - Blobs_OJ_thresh_final;
 Blobs_win_sd = nanstd(Blobs_win_se_val);
 Blobs_OJ_win_se = Blobs_win_sd./(size(Blobs_OJ_pmeans(~isnan(Blobs_OJ_pmeans)),1) ^ (1/2));
-Blobs_NT = [Blobs_OJ_pmeans; Blobs_OJ_thresh_final;Blobs_OJ_win_se];
-save('/Users/samyuktajayakumar/Sightseeing Dropbox/Samyukta Jayakumar/Mac/Desktop/Winter_2022_Course_Materials/PSYC 259/Final Project/PSYC-259-Final-Project/Codes/SP/Blobs_NT','Blobs_NT');
+Blobs_SP = [Blobs_OJ_pmeans; Blobs_OJ_thresh_final;Blobs_OJ_win_se];
 
 % Squiggles
 
@@ -566,8 +494,7 @@ Squiggles_OJ_thresh_final = nanmean(Squiggles_OJ_pmeans);
 Squiggles_win_se_val = Squiggles_OJ_pmeans - Squiggles_OJ_thresh_final;
 Squiggles_win_sd = nanstd(Squiggles_win_se_val);
 Squiggles_OJ_win_se = Squiggles_win_sd./(size(Squiggles_OJ_pmeans(~isnan(Squiggles_OJ_pmeans)),1) ^ (1/2));
-Squiggles_NT = [Squiggles_OJ_pmeans; Squiggles_OJ_thresh_final;Squiggles_OJ_win_se];
-save('/Users/samyuktajayakumar/Sightseeing Dropbox/Samyukta Jayakumar/Mac/Desktop/Winter_2022_Course_Materials/PSYC 259/Final Project/PSYC-259-Final-Project/Codes/SP/Squiggles_NT','Squiggles_NT');
+Squiggles_SP = [Squiggles_OJ_pmeans; Squiggles_OJ_thresh_final;Squiggles_OJ_win_se];
 
 % Letters
 
@@ -578,5 +505,25 @@ Letters_OJ_thresh_final = nanmean(Letters_OJ_pmeans);
 Letters_win_se_val = Letters_OJ_pmeans - Letters_OJ_thresh_final;
 Letters_win_sd = nanstd(Letters_win_se_val);
 Letters_OJ_win_se = Letters_win_sd./(size(Letters_OJ_pmeans(~isnan(Letters_OJ_pmeans)),1) ^ (1/2));
-Letters_NT = [Letters_OJ_pmeans; Letters_OJ_thresh_final;Letters_OJ_win_se];
-save('/Users/samyuktajayakumar/Sightseeing Dropbox/Samyukta Jayakumar/Mac/Desktop/Winter_2022_Course_Materials/PSYC 259/Final Project/PSYC-259-Final-Project/Codes/SP/Letters_NT','Letters_NT');
+Letters_SP = [Letters_OJ_pmeans; Letters_OJ_thresh_final;Letters_OJ_win_se];
+
+%% Creating .csv files for OJ thresholds for SP
+load('Circle_NT.mat');load('Lines_NT.mat');load('Ellipses_NT.mat');load('Spiral_NT.mat');
+load('Blobs_NT.mat');load('Squiggles_NT.mat');load('Letters_NT.mat');
+
+Shapes = ["Circle";"Lines";"Ellipses";"Spiral";"Blobs";"Squiggles";"Letters";...
+    "Circle";"Lines";"Ellipses";"Spiral";"Blobs";"Squiggles";"Letters"];
+
+Mean = [Circle_SP(4,1);Lines_SP(4,1);Ellipses_SP(4,1);Spiral_SP(4,1)...
+    ;Blobs_SP(4,1);Squiggles_SP(4,1);Letters_SP(4,1);...
+    Circle_NT(4,1);Lines_NT(4,1);Ellipses_NT(4,1);Spiral_NT(4,1)...
+    ;Blobs_NT(4,1);Squiggles_NT(4,1);Letters_NT(4,1)];
+
+SE = [Circle_SP(5,1);Lines_SP(5,1);Ellipses_SP(5,1);Spiral_SP(5,1)...
+    ;Blobs_SP(5,1);Squiggles_SP(5,1);Letters_SP(5,1);...
+    Circle_NT(5,1);Lines_NT(5,1);Ellipses_NT(5,1);Spiral_NT(5,1)...
+    ;Blobs_NT(5,1);Squiggles_NT(5,1);Letters_NT(5,1)];
+
+Group = ["SP";"SP";"SP";"SP";"SP";"SP";"SP";"NT";"NT";"NT";"NT";"NT";"NT";"NT"];
+OJ = table(Group,Shapes,Mean,SE);
+writetable(OJ,'OJ.csv');

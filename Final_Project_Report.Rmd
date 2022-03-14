@@ -7,6 +7,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(knitr)
 ```
 
 ## Brief Overview
@@ -21,7 +24,7 @@ A total of 24 patients with Schizophrenia (SP) and 15 Neurotypical individuals (
 
 ## Experimental Design
 
-All participants underwent training for 40 sessions with SP performing one session per day and NT performing two sessions per day. All participants were trained on 15 different shapes, classified into 7 families of shapes, throughout their training period and the order of presentation of shapes was conserved between both the groups. Two parameters (Orientation jitter and inducer number) were manipulated during the training period using a combination of streaking and adaptive 3 down/1 up staircase method. This controlled the difficulty of training during each session. 
+All participants underwent training for 40 sessions with SP performing one session per day and NT performing two sessions per day. All participants were trained on 15 different shapes, classified into 7 families of shapes, throughout their training period and the order of presentation of shapes was conserved between both the groups. Two parameters **Orientation Jitter (OJ)** and **Inducer Number (IN)** were manipulated during the training period using a combination of streaking and adaptive 3 down/1 up staircase method. This controlled the difficulty of training during each session. 
 
 The figure depicts some of the shapes presented during the study
 
@@ -33,8 +36,273 @@ For the purpose of the current project no training/learning effects were evaluat
 
 Several steps were involved in cleaning of data files before the data could be processed and visualized. MATALB 2020b software was used to perform data cleaning and analysis and the final plots were then visualized using the RStudio 2021.09.1 software.
 
-**Note:** For purpose of efficiently sharing the data on Github, I've added only the relevant data files from 5 SP and 5 NT participants and will be performing analyses only using these files. 
+**Note:** For purpose of efficiently sharing the data on Github, I've added only the relevant data files from `3 SP` and `3 NT` participants for *20 training sessions* and will be performing analyses only on the `Orientation Jitter` data using these files. The same procedure can then be followed for analysing the Inducer Number Data later.
 
-### Step 1:
+### Step 1: Cleaning Log Files
 
+An example of a typical participant log file looks like this:
+CA1005A_000_000_000_ContourChange*_19_02_07_15_29_36*.json
+This contains trailing details (italicized) about the time the data file was logged which makes it hard to read the individual files in the document. To circumvent that issue, I wrote a function on MATLAB that deletes this details and renames all the files within the folder. The function is as follows:
 
+```
+%% Renaming files
+clear all
+clc
+
+files = dir ('*.json'); % Identifies all .json files within the directory
+for i = 1:length(files) 
+    [~,names] = fileparts(files(i).name);
+    expression = 'STS(\w+)\d'; %CA or NA or STS
+    name2replace = names(1:end-18); % Removes the last 18 characters i.e. trailing details
+    newname = regexprep(names,expression,name2replace);
+    newjson = strcat(newname, '.json');
+    movefile(files(i).name, newjson); % Replaces the file within the directory
+end
+```
+
+### Step 2: Aggregating data for all participants across all sessions
+
+The next step would be to create an aggregated data file that pools in the logs for all participants and each session. The code block below does this in matlab and stores 2 files 
+
+1. Data log aggregate for all SP named as `SP_Data.mat`
+1. Data log aggregate for the summary file for each session and participant named as `SP_summary.mat`
+
+Each row corresponds to a participant and each column corresponds to a session, so we have `3x20` data file of cell format
+
+I used a code that loops through all participant files within the directory and separate them based on their session without hard coding the participant detail which was a major issue previously. I could also save them without checking if the data was correctly isolated using this method. 
+
+```
+%% For aggregating individual data log file for each participant
+
+files = dir('*.json'); % Identifies all .json files from the directory
+count = 1;
+part_cmp = 'CA1005A'; % Reference participant # to begin the loop
+for i = 1:length(files)
+    [~,names] = fileparts(files(i).name);
+    cmp_name = names(end-9:end);
+    log_name = 'ContourLog'; % Isolates the log file name
+    part_name = names(1:7);  % Isolates the participant name
+    ses_name = names(10:11); % Isolates the session #
+    run_name = names(18:19); % Isolates the run #
+    ses = str2double(regexp(ses_name,'\d*','match'));
+    run = str2double(regexp(run_name,'\d*','match'));
+    if sum(part_name ~= part_cmp) > 0 % Comparing strings
+        count = count + 1;
+        part_cmp = part_name;
+        if cmp_name == log_name
+            fname = (files(i).name);
+            val = jsondecode(fileread(fname));
+            SP{count,ses+1}{1,run+1} = val.data; % Enters participants as rows and sessions as columns in a cell format
+        end
+    else
+        if cmp_name == log_name
+            fname = (files(i).name);
+            val = jsondecode(fileread(fname));
+            SP{count,ses+1}{1,run+1} = val.data;
+        end
+    end
+end
+save('SP_data', 'SP')
+```
+
+```
+%% For aggregating summary files of each participant
+
+files = dir('*.json');
+count = 1;
+part_cmp = 'CA1005A';
+for i = 1:length(files)
+    [~,names] = fileparts(files(i).name);
+    cmp_name = names(end-6:end);
+    log_name = 'Summary';
+    part_name = names(1:7);
+    ses_name = names(10:11);
+    ses = str2double(regexp(ses_name,'\d*','match'));
+    if sum(part_name ~= part_cmp) > 0
+        count = count + 1;
+        part_cmp = part_name;
+        if cmp_name == log_name
+            fname = (files(i).name);
+            val = jsondecode(fileread(fname));
+            SP{count,ses+1}{1,run+1} = val.data;
+        end
+    else
+            if (cmp_name == log_name)
+                fname = (files(i).name);
+                val = jsondecode(fileread(fname));
+                SP_summary{count,ses+1} = val.data;
+            end
+    end
+end
+save('SP_summary', 'SP_summary')
+```
+
+A similar method was used to create two aggregate matrices for NT group as well. They were named `NT_data.mat` and `NT_summary.mat`
+
+### Step 3: Isolating data for each Contour Shape for all participants across all sessions
+
+The first step towards analysing the data would be to isolate participant and session wise information for all families of Contour shapes i.e., `Circle`, `Lines`, `Ellipses`, `Spiral`, `Blobs`, `Squiggles` and `Letters`.
+
+To do this we must first use a `for` loop that runs through every participant and every session and isolates the shape wise information. This is done using the following piece of code from MATLAB
+
+```
+for i = 1:size(SP,1) % For each participant
+    for j = 1:size(SP,2) % For each session
+        % Setting counters for each Family
+        count1 = 0;
+        count2 = 0;
+        count3 = 0;
+        count4 = 0;
+        count5 = 0;
+        count6 = 0;
+        count7 = 0;
+        if ~isempty(SP_summary{i,j})
+            for k = 1:length(SP_summary{i,j})
+                if contains(SP_summary{i,j}{k,1}.game_type, Contour)
+                    if contains(SP_summary{i,j}{k,1}.contour_parameter, OrientationJitter)
+                        run = SP_summary{i,j}{k,1}.run + 1;
+                        if strcmp(SP_summary{i,j}{k,1}.contour_class, Circle_General) % Comparing strings within the summary file to isolate runs when Circle shape was presented
+                            count1 = count1 + 1;
+                            Circle{i,j}{count1,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Line_V) || strcmp(SP_summary{i,j}{k,1}.contour_class, Line_H)
+                            count2 = count2 + 1;
+                            Lines{i,j}{count2,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Ellipse_V) || strcmp(SP_summary{i,j}{k,1}.contour_class, Ellipse_H) || strcmp(SP_summary{i,j}{k,1}.contour_class, Ellipse_R)
+                            count3 = count3 + 1;
+                            Ellipses{i,j}{count3,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Spiral_General)
+                            count4 = count4 + 1;
+                            Spiral{i,j}{count4,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Blob_1) || strcmp(SP_summary{i,j}{k,1}.contour_class, Blob_2) || strcmp(SP_summary{i,j}{k,1}.contour_class, Blob_3)
+                            count5 = count5 + 1;
+                            Blobs{i,j}{count5,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Squiggle_V) || strcmp(SP_summary{i,j}{k,1}.contour_class, Squiggle_H)
+                            count6 = count6 + 1;
+                            Squiggles{i,j}{count6,1} = SP{i,j}{1,run};
+                        else
+                            if strcmp(SP_summary{i,j}{k,1}.contour_class, Letter_B) || strcmp(SP_summary{i,j}{k,1}.contour_class, Letter_D) || strcmp(SP_summary{i,j}{k,1}.contour_class, Letter_P)
+                                count7 = count7 + 1;
+                                Letters{i,j}{count7,1} = SP{i,j}{1,run};
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+```
+
+The above code is for isolating the `Orientation Jitter` parameter. The same code is used to isolate the second parameter - `Inducer Number` by replacing the following line of code in the previous code block 
+`if contains(SP_summary{i,j}{k,1}.contour_parameter, OrientationJitter)` with `if contains(SP_summary{i,j}{k,1}.contour_parameter, InducerNumber)`
+
+### Step 4: Identifying Orientation Jitter Thresholds
+
+As stated previously, two variables of interest needs to be isolated for each participant across all sessions for each Contour shape. The first parameter is the `Orientation Jitter threshold` which is the maximum tolerable deviation in the orientation of the individual elements that make up the shape. 
+Following is the code used to isolate the `OJ Threshold` for all SP participants and all sessions for each contour shape. The code block shows an example of how to isolate the OJ threshold for the `Circle` shape
+
+```
+for ii = 1:size(Circle,1)
+    for jj = 1:size(Circle,2)
+        if isempty(Circle{ii,jj}) == 1
+            avg_thresh_ori = NaN;
+            Thresh_ori = NaN;
+        else
+            for kk = 1:length(Circle{ii,jj})
+                count_ori = [];
+                for mm = 4:length(Circle{ii,jj}{kk,1})                   
+                    count_ori = [count_ori ; Circle{ii,jj}{kk,1}(mm,1).orientationJitter];
+                end
+                thresh_ori = [];
+                flag_ori = 0;
+                for ll = 1:length(count_ori) - 1
+                    c = 0;
+                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 1;
+                    end
+                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 0;
+                    end
+                end
+                avg_thresh_ori = mean(thresh_ori,'omitnan');
+                Thresh_ori(kk,1) = avg_thresh_ori;
+                clear count_ori
+            end
+        end
+        Circle_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
+        clear avg_thresh_ori; clear Thresh_ori;
+    end
+end
+
+save('Circle_OJ_thresh','Circle_thresh');
+```
+
+This was repeated for all Contour shapes. Once the thresholds were isolated, I calculated the average threshold for each shape by taking the average of all participants over all sessions and estimated the within subject standard error as follows for each shape. Following is an example for the `Circle` contour shape.
+
+```
+Circle_OJ_pmeans = nanmean(Circle_OJ_thresh,2); %participant means over 40 sessions
+Circle_OJ_thresh_final = nanmean(Circle_OJ_pmeans);
+% Within subject SE
+Circle_win_se_val = Circle_OJ_pmeans - Circle_OJ_thresh_final;
+Circle_win_sd = nanstd(Circle_win_se_val);
+Circle_OJ_win_se = Circle_win_sd./(size(Circle_OJ_pmeans(~isnan(Circle_OJ_pmeans)),1) ^ (1/2));
+```
+
+### Step 5: Saving the aggregate data as .csv files for visualization
+
+The thresholds calculated in the above steps were then stored in .csv files and the data was visualized using RStudio. The MATLAB code used to save the data as a .csv file is as follows
+
+```
+Shapes = ["Circle";"Lines";"Ellipses";"Spiral";"Blobs";"Squiggles";"Letters";...
+    "Circle";"Lines";"Ellipses";"Spiral";"Blobs";"Squiggles";"Letters"];
+
+Mean = [Circle_SP(4,1);Lines_SP(4,1);Ellipses_SP(4,1);Spiral_SP(4,1)...
+    ;Blobs_SP(4,1);Squiggles_SP(4,1);Letters_SP(4,1);...
+    Circle_NT(4,1);Lines_NT(4,1);Ellipses_NT(4,1);Spiral_NT(4,1)...
+    ;Blobs_NT(4,1);Squiggles_NT(4,1);Letters_NT(4,1)];
+
+SE = [Circle_SP(5,1);Lines_SP(5,1);Ellipses_SP(5,1);Spiral_SP(5,1)...
+    ;Blobs_SP(5,1);Squiggles_SP(5,1);Letters_SP(5,1);...
+    Circle_NT(5,1);Lines_NT(5,1);Ellipses_NT(5,1);Spiral_NT(5,1)...
+    ;Blobs_NT(5,1);Squiggles_NT(5,1);Letters_NT(5,1)];
+
+Group = ["SP";"SP";"SP";"SP";"SP";"SP";"SP";"NT";"NT";"NT";"NT";"NT";"NT";"NT"];
+OJ = table(Group,Shapes,Mean,SE);
+writetable(OJ,'OJ.csv');
+```
+
+### Step 6: Data Visualization
+
+Bar graphs were used to visualize the family-wise threshold data for both SP and NT groups separately and also compared with each other. The following code generates a graph denoting the **Family - wise Average OJ thresholds for SP and NT groups**
+
+```{r warning = FALSE, message=FALSE}
+OJ <- read_csv('OJ.csv')
+
+# Plotting graph for all Contour Shapes
+
+p <- ggplot(OJ, aes(x=Shapes, y=Mean, fill=Group)) + 
+   geom_bar(stat="identity", position=position_dodge()) +
+  geom_errorbar(aes(ymin=Mean-SE, ymax=Mean+SE), width=.2,
+                 position=position_dodge(.9))
+p + labs(title="Average Orientation Jitter Thresholds", 
+         x="Contour Shapes", y = "Jitter thresholds") + scale_fill_brewer(palette="Paired") + theme_minimal()
+
+```
+
+Similar codes were used to analyse the data for the **Inducer Number** parameter as well. For ease, I've just included the final .csv file generated and plot the graphs showing **Family - wise Average IN thresholds for SP and NT groups** below
+
+```{r warning = FALSE, message=FALSE}
+IN <- read_csv('IN.csv')
+
+# Plotting graph for all Contour Shapes
+
+p <- ggplot(IN, aes(x=Shapes, y=Mean, fill=Group)) + 
+   geom_bar(stat="identity", position=position_dodge()) +
+  geom_errorbar(aes(ymin=Mean-SE, ymax=Mean+SE), width=.2,
+                 position=position_dodge(.9))
+p + labs(title="Average Inducer Number Thresholds", 
+         x="Contour Shapes", y = "Inducer thresholds") + scale_fill_brewer(palette="Paired") + theme_minimal()
+
+```

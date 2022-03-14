@@ -3,359 +3,527 @@ clear all
 close all
 clc
 
-%% Converting .json to matlab readable format and isolating data for all SF's
-% Picking people with complete training session data for contrast task
-part = [1005, 1018, 1028, 1005, 1018, 1002, 1012, 1016, 1002, 1016, 1017]; % CA participants with all 40 training summary files, no combined session summaries
-% part = [1005, 1006, 1018, 1019, 1028, 1005, 1006, 1018, 1019, 1020, 1002, 1012, 1014, 1016, 1017, 1023, 1002, 1012, 1016, 1017]; % CA participants with all 40 training summary files, no combined session summaries
-for p = 1:length(part)
-    for i = 0:39
-        for j = 0:1
-            if  p < 4
-                if i < 10
-                    fname = (['CA' num2str(part(p)) 'A_00' num2str(i) '_000_00' num2str(j) '_ContourLog.json']);
-                    val = jsondecode(fileread(fname));
-                    Data_SP_40{p}{i+1,j+1} = val.data;
-                else
-                    fname = (['CA' num2str(part(p)) 'A_0' num2str(i) '_000_00' num2str(j) '_ContourLog.json']);
-                    val = jsondecode(fileread(fname));
-                    Data_SP_40{p}{i+1,j+1} = val.data;
-                end
-            else if p == 4
-                    if i < 10
-                        fname = (['Na' num2str(part(p)) 'A_00' num2str(i) '_000_00' num2str(j) '_ContourLog.json']);
-                        val = jsondecode(fileread(fname));
-                        Data_SP_40{p}{i+1,j+1} = val.data;
-                    else
-                        fname = (['Na' num2str(part(p)) 'A_0' num2str(i) '_000_00' num2str(j) '_ContourLog.json']);
-                        val = jsondecode(fileread(fname));
-                        Data_SP_40{p}{i+1,j+1} = val.data;
-                    end
-                else if p == 5
-                        if i < 10
-                            fname = (['NA' num2str(part(p)) 'A_00' num2str(i) '_000_00' num2str(j) '_ContourLog.json']);
-                            val = jsondecode(fileread(fname));
-                            Data_SP_40{p}{i+1,j+1} = val.data;
-                        else
-                            fname = (['NA' num2str(part(p)) 'A_0' num2str(i) '_000_00' num2str(j) '_ContourLog.json']);
-                            val = jsondecode(fileread(fname));
-                            Data_SP_40{p}{i+1,j+1} = val.data;
-                        end
-                    else if (p > 6 && p < 9)
-                            if i < 10
-                                
-                                fname = (['CA' num2str(part(p)) 'A_00' num2str(i) '_002_00' num2str(j) '_ContourLog.json']);
-                                val = jsondecode(fileread(fname));
-                                Data_SP_40{p}{i+1,j+1} = val.data;
-                            else
-                                
-                                fname = (['CA' num2str(part(p)) 'A_0' num2str(i) '_002_00' num2str(j) '_ContourLog.json']);
-                                val = jsondecode(fileread(fname));
-                                Data_SP_40{p}{i+1,j+1} = val.data;
-                            end
-                        else if p == 6
-                                if i < 10
-                                    fname = (['CA' num2str(part(p)) 'B_00' num2str(i) '_002_00' num2str(j) '_ContourLog.json']);
-                                    val = jsondecode(fileread(fname));
-                                    Data_SP_40{p}{i+1,j+1} = val.data;
-                                else
-                                    fname = (['CA' num2str(part(p)) 'B_0' num2str(i) '_002_00' num2str(j) '_ContourLog.json']);
-                                    val = jsondecode(fileread(fname));
-                                    Data_SP_40{p}{i+1,j+1} = val.data;
-                                end
-                            else
-                                if i < 10
-                                    fname = (['NA' num2str(part(p)) 'A_00' num2str(i) '_002_00' num2str(j) '_ContourLog.json']);
-                                    val = jsondecode(fileread(fname));
-                                    Data_SP_40{p}{i+1,j+1} = val.data;
-                                else
-                                    fname = (['NA' num2str(part(p)) 'A_0' num2str(i) '_002_00' num2str(j) '_ContourLog.json']);
-                                    val = jsondecode(fileread(fname));
-                                    Data_SP_40{p}{i+1,j+1} = val.data;
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-%% Separating inducers (count) and orientation jitters
-Data_SP_40 = Data_SP_40';
+%% Looping through every file in the directory - Individual and Summary
 
-%% Getting the inducer thresholds
-
-% for p = 1:length(Data_SP_40)
-%     for i = 1:length(Data_SP_40{p,1})
-%         if i == 1
-%             continue;
-%         end
-%         for j = 1:2 %size(Data{p,1},2)
-%             if isempty(Data_SP_40{p,1}{i,j}) == 1
-%                 continue;
-%             else
-%                 [~, idx] = unique([Data_SP_40{p,1}{i,j}.inducers].', 'rows', 'stable');
-%                 [~, idx2] = unique([Data_SP_40{p,1}{i,j}.orientationJitter].','rows','stable');
-%                 if j == 2
-%                     count = [];
-%                     for k = 1:length(Data_SP_40{p,1}{i,j})
-%                         count = [count ; Data_SP_40{p,1}{i,j}(k,1).inducers];
-%                     end
-%                     thresh = [];
-%                     flag = 0;
-%                     for ii = 1:length(count) - 1
-%                         c = 0;
-%                         if count(ii+1) < count(ii) && flag == 0
-%                             thresh = [thresh ; count(ii)];
-%                             flag = 1;
-%                         end
-%                         if count(ii+1) > count(ii) && flag == 1
-%                             thresh = [thresh ; count(ii)];
-%                             flag = 0;
-%                         end
-%                     end
-%                     avg_thresh = mean(thresh);
-%                     Thresh{1,j} = avg_thresh;
-%                 end
-%             end
-%         end
-%         Thresh_mat = cell2mat(Thresh);
-%         Avg_Count_Thresh{p,1}{i,1} = mean(Thresh_mat);
-%     end
-% end
-% Avg_Count_Thresh = cellfun(@empty2nan, Avg_Count_Thresh, 'UniformOutput', false);
-%
-% for p = 1:length(Data_SP_40)
-%     average = mean(cell2mat(Avg_Count_Thresh{p,1}), 'omitnan');
-%     se_val{p,1} =  abs(cell2mat(Avg_Count_Thresh{p,1}) - average);
-% end
-%
-% for i = 1:40
-%     Avg = [];
-%     SE_Avg = [];
-%     for p = 1:length(Data_SP_40)
-%         avg = cell2mat(Avg_Count_Thresh{p,1}(i,1));
-%         se_avg = se_val{p,1}(i,1);
-%         Avg = [Avg; avg];
-%         SE_Avg = [SE_Avg; se_avg];
-%     end
-%     Count_avg_SC{i,1} = mean(Avg, 'omitnan');
-% %     Count_avg_SC{i,1} = 1./ Count_avg_SC{i,1};
-% %     Count_avg_SC{i,1} = log10(Count_avg_SC{i,1});
-%     Count_SD_SC{i,1} = std(SE_Avg, 'omitnan');
-% end
-%
-% Count_SE_SC = cell2mat(Count_SD_SC) ./ (length(part))^(1/2);
-%
-% %% Plotting the Average Count data for all participants over 40 training sessions
-% % load('Contour_Count_Avg_Healthy.mat')
-% % load('Contour_Count_SD_Healthy.mat')
-% load('Count_Thresh_Healthy_40.mat')
-% load('Count_SE_Healthy_40.mat')
-% figure(1);
-% x1 = 2:40;
-% y1 = cell2mat(Count_avg_SC);
-% y1 = y1(2:40);
-% error1 = Count_SE_SC(2:40);
-% h_plot(1) = errorbar(x1,y1,error1,'.b', 'MarkerSize', 12, 'DisplayName', 'SP(n=23)')
-% grid on;
-% hold on;
-% fit1 = polyfit(x1,y1,1);
-% h_plot(2) = plot(x1, fit1(1)*x1 + fit1(2), '--b', 'DisplayName', 'Fit- SP')
-% l = legend('show'); l.Location = 'best';
-%
-% x2 = 2:40;
-% y2 = cell2mat(Count_avg);
-% y2 = y2(2:40);
-% error2 = Count_SE(2:40);
-% hold on;
-% h_plot(1) = errorbar(x2,y2,error2,'.r', 'MarkerSize', 12, 'DisplayName', 'NT(n=15)')
-% grid on;
-% hold on;
-% fit2 = polyfit(x2,y2,1);
-% h_plot(2) = plot(x2, fit2(1)*x2 + fit2(2), '--r', 'DisplayName', 'Fit- NT')
-% l = legend('show'); l.Location = 'best';
-% title('Contour Inducer Threshold (20 Sessions)', 'fontsize', 14)
-% xlabel('Training Sessions')
-% ylabel('Inducers')
-%
-%
-% % subplot(4,2,2)
-% for i = 1:40
-%         hold on;
-%         errorbar(i,Count_avg_SC{i,1},Count_SE_SC(i,1),'.b','MarkerSize',12);
-%         a = get(gca,'Children');
-%
-%     hold on;
-%         hold on;
-%         errorbar(i,Count_avg{i,1},Count_SE(i,1),'.r','MarkerSize',12)
-%         b = get(gca,'Children');
-%
-% end
-% hold on;
-% h = [b;a]
-% xlim([0,40])
-% title('Contour Count Threshold (40 Sessions)', 'fontsize', 14)
-% xlabel('Training Sessions')
-% ylabel('Inducers')
-% % legend('Schizo Subjects','location','southeast');
-% legend(h,'NT (n = 7)','SP (n = 11)','location','southeast');
-
-%% Isolating contour orientation jitter information according to inducer level
-
-% Getting the orientation jitter thresholds
-% clear all
-% clc
-
-% part = [1005, 1018, 1019, 1028, 1005, 1006, 1018];
-% load('Data_Schizo_Contour.mat')
-
-for p = 1:length(Data)
-    for i = 1:length(Data{p,1})
-        if i == 1
-            continue;
-        end
-        for j = 1:2 %size(Data{p,1},2)
-            if isempty(Data{p,1}{i,j}) == 1
-                continue;
-            else
-                [~, idx] = unique([Data{p,1}{i,j}.inducers].', 'rows', 'stable');
-                [~, idx2] = unique([Data{p,1}{i,j}.orientationJitter].','rows','stable');
-                if j == 1
-                    count = [];
-                    for k = 1:length(Data{p,1}{i,j})
-                        count = [count ; Data{p,1}{i,j}(k,1).orientationJitter];
-                    end
-                    thresh = [];
-                    flag = 0;
-                    for ii = 1:length(count) - 1
-                        c = 0;
-                        if count(ii+1) < count(ii) && flag == 0
-                            thresh = [thresh ; count(ii)];
-                            flag = 1;
-                        end
-                        if count(ii+1) > count(ii) && flag == 1
-                            thresh = [thresh ; count(ii)];
-                            flag = 0;
-                        end
-                    end
-                    avg_thresh = mean(thresh);
-                    Thresh{1,j} = avg_thresh;
-                end
-            end
-        end
-        Thresh_mat = cell2mat(Thresh);
-        Avg_OJ_Thresh{p,1}{i,1} = mean(Thresh_mat);
-    end
-end
-Avg_OJ_Thresh = cellfun(@empty2nan, Avg_OJ_Thresh, 'UniformOutput', false);
-
-for p = 1:length(part)
-    average = mean(cell2mat(Avg_OJ_Thresh{p,1}), 'omitnan');
-    se_val{p,1} =  abs(cell2mat(Avg_OJ_Thresh{p,1}) - average);
-end
-
-for i = 1:20
-    Avg = [];
-    SE_Avg = [];
-    for p = 1:length(part)
-        avg = cell2mat(Avg_OJ_Thresh{p,1}(i,1));
-        se_avg = se_val{p,1}(i,1);
-        Avg = [Avg; avg];
-        SE_Avg = [SE_Avg; se_avg];
-    end
-    OJ_avg_SC{i,1} = mean(Avg, 'omitnan');
-    %     OJ_avg_SC{i,1} = 1./ OJ_avg_SC{i,1};
-    %     OJ_avg_SC{i,1} = log10(OJ_avg_SC{i,1});
-    OJ_SD_SC{i,1} = std(SE_Avg, 'omitnan');
-end
-
-OJ_SE_SC = cell2mat(OJ_SD_SC) ./ (length(part))^(1/2);
-
-% Plotting the Average Count data for all participants over 40 training sessions
-% load('Contour_OJ_Healthy.mat')
-% load('Contour_OJ_SD_HEalthy.mat')
-load('OJ_Thresh_Healthy_40.mat')
-load('OJ_SE_Healthy_40.mat')
-figure(2);
-x1 = 2:40;
-y1 = cell2mat(OJ_avg_SC);
-y1 = y1(2:40);
-error1 = OJ_SE_SC(2:40);
-h_plot(1) = errorbar(x1,y1,error1,'.b', 'MarkerSize', 12, 'DisplayName', 'SP(n=11)')
-grid on;
-hold on;
-fit1 = polyfit(x1,y1,1);
-h_plot(2) = plot(x1, fit1(1)*x1 + fit1(2), '--b', 'DisplayName', 'Fit- SP')
-l = legend('show'); l.Location = 'best';
-
-x2 = 2:40;
-y2 = cell2mat(OJ_avg);
-y2 = y2(2:40);
-error2 = OJ_SE(2:40);
-hold on;
-h_plot(1) = errorbar(x2,y2,error2,'.r', 'MarkerSize', 12, 'DisplayName', 'NT(n=7)')
-grid on;
-hold on;
-fit2 = polyfit(x2,y2,1);
-h_plot(2) = plot(x2, fit2(1)*x2 + fit2(2), '--r', 'DisplayName', 'Fit- NT')
-l = legend('show'); l.Location = 'best';
-title('Contour Orientation Jitter Threshold (40 Sessions)', 'fontsize', 14)
-xlabel('Training Sessions')
-ylabel('Orientation')
-
-%% Plotting individual participant tracks
-% Orientation Jitter Info - Correct and incorrect responses
-ses = [ 2, 7, 14, 19];
-for ii = 1:length(ses)
-    if ii < 3
-        fname = (['CA1005A_00' num2str(ses(ii)) '_000_001_ContourClick.json']);%D_00' num2str(i) '_000_00' num2str(j) '_ContourLog.json']);
-        val = jsondecode(fileread(fname));
-        Data_click{ii} = val.data;
-    else
-        if ii > 2
-            fname = (['CA1005A_0' num2str(ses(ii)) '_000_001_ContourClick.json']);%D_00' num2str(i) '_000_00' num2str(j) '_ContourLog.json']);
+files = dir('*.json'); % Identifies all .json files from the directory
+count = 1;
+part_cmp = 'CA1005A'; % Reference participant # to begin the loop
+for i = 1:length(files)
+    [~,names] = fileparts(files(i).name);
+    cmp_name = names(end-9:end);
+    log_name = 'ContourLog'; % Isolates the log file name
+    part_name = names(1:7);  % Isolates the participant name
+    ses_name = names(10:11); % Isolates the session #
+    run_name = names(18:19); % Isolates the run #
+    ses = str2double(regexp(ses_name,'\d*','match'));
+    run = str2double(regexp(run_name,'\d*','match'));
+    if sum(part_name ~= part_cmp) > 0 % Comparing strings
+        count = count + 1;
+        part_cmp = part_name;
+        if cmp_name == log_name
+            fname = (files(i).name);
             val = jsondecode(fileread(fname));
-            Data_click{ii} = val.data;
+            SP{count,ses+1}{1,run+1} = val.data; % Enters participants as rows and sessions as columns in a cell format
+        end
+    else
+        if cmp_name == log_name
+            fname = (files(i).name);
+            val = jsondecode(fileread(fname));
+            SP{count,ses+1}{1,run+1} = val.data;
         end
     end
 end
-Target = "Target";
-for jj = 1:length(Data_click)
-    trial_no = [];
-    for kk = 1:length(Data_click{1,jj})
-        if contains(Data_click{1,jj}(kk).type, Target)
-            trial_no = [trial_no; Data_click{1,jj}(kk).trial];
+save('SP_data', 'SP')
+
+% Summary Files
+
+files = dir('*.json');
+count = 1;
+part_cmp = 'CA1005A';
+for i = 1:length(files)
+    [~,names] = fileparts(files(i).name);
+    cmp_name = names(end-6:end);
+    log_name = 'Summary';
+    part_name = names(1:7);
+    ses_name = names(10:11);
+    ses = str2double(regexp(ses_name,'\d*','match'));
+    if sum(part_name ~= part_cmp) > 0
+        count = count + 1;
+        part_cmp = part_name;
+        if cmp_name == log_name
+            fname = (files(i).name);
+            val = jsondecode(fileread(fname));
+            SP{count,ses+1}{1,run+1} = val.data;
+        end
+    else
+            if (cmp_name == log_name)
+                fname = (files(i).name);
+                val = jsondecode(fileread(fname));
+                SP_summary{count,ses+1} = val.data;
+            end
+    end
+end
+save('SP_summary', 'SP_summary')
+
+
+%% Isolating data for Families of Contour shapes
+
+Contour = 'Contour'; % Task name
+contour_class = 'contour_class'; % Class of task name
+OrientationJitter = 'OrientationJitter'; % Parameter 1
+InducerNumber = 'Count'; % Parameter 2
+
+Circle_General = "Circle_General"; % Task coded name for Circle shape
+Line_V = "Line_V"; % Task coded name for Line shape 1
+Line_H = "Line_H"; % Task coded name for Line shape 2
+Ellipse_V = "Ellipse_V_Fixed"; % Task coded name for Ellipse shape 1
+Ellipse_H = "Ellipse_H_Fixed"; % Task coded name for Ellipse shape 2
+Ellipse_R = "Ellipse_R_Fixed"; % Task coded name for Ellipse shape 3
+Spiral_General = "Spiral_General"; % Task coded name for Spiral shape
+Blob_1 = "Blob_1"; % Task coded name for Blob shape 1
+Blob_2 = "Blob_2"; % Task coded name for Blob shape 2
+Blob_3 = "Blob_3"; % Task coded name for Blob shape 3
+Squiggle_V = "Squiggle_V_Locked"; % Task coded name for Squiggle shape 1
+Squiggle_H = "Squiggle_H_Locked"; % Task coded name for Squiggle shape 2
+Letter_B = "Letter_B"; % Task coded name for Letter shape 1
+Letter_D = "Letter_D"; % Task coded name for Letter shape 2
+Letter_P = "Letter_P"; % Task coded name for Letter shape 3
+
+for i = 1:size(SP,1) % For each participant
+    for j = 1:size(SP,2) % For each session
+        % Setting counters for each Family
+        count1 = 0;
+        count2 = 0;
+        count3 = 0;
+        count4 = 0;
+        count5 = 0;
+        count6 = 0;
+        count7 = 0;
+        if ~isempty(SP_summary{i,j})
+            for k = 1:length(SP_summary{i,j})
+                if contains(SP_summary{i,j}{k,1}.game_type, Contour)
+                    if contains(SP_summary{i,j}{k,1}.contour_parameter, OrientationJitter)
+                        run = SP_summary{i,j}{k,1}.run + 1;
+                        if strcmp(SP_summary{i,j}{k,1}.contour_class, Circle_General) % Comparing strings within the summary file to isolate runs when Circle shape was presented
+                            count1 = count1 + 1;
+                            Circle{i,j}{count1,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Line_V) || strcmp(SP_summary{i,j}{k,1}.contour_class, Line_H)
+                            count2 = count2 + 1;
+                            Lines{i,j}{count2,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Ellipse_V) || strcmp(SP_summary{i,j}{k,1}.contour_class, Ellipse_H) || strcmp(SP_summary{i,j}{k,1}.contour_class, Ellipse_R)
+                            count3 = count3 + 1;
+                            Ellipses{i,j}{count3,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Spiral_General)
+                            count4 = count4 + 1;
+                            Spiral{i,j}{count4,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Blob_1) || strcmp(SP_summary{i,j}{k,1}.contour_class, Blob_2) || strcmp(SP_summary{i,j}{k,1}.contour_class, Blob_3)
+                            count5 = count5 + 1;
+                            Blobs{i,j}{count5,1} = SP{i,j}{1,run};
+                        elseif strcmp(SP_summary{i,j}{k,1}.contour_class, Squiggle_V) || strcmp(SP_summary{i,j}{k,1}.contour_class, Squiggle_H)
+                            count6 = count6 + 1;
+                            Squiggles{i,j}{count6,1} = SP{i,j}{1,run};
+                        else
+                            if strcmp(SP_summary{i,j}{k,1}.contour_class, Letter_B) || strcmp(SP_summary{i,j}{k,1}.contour_class, Letter_D) || strcmp(SP_summary{i,j}{k,1}.contour_class, Letter_P)
+                                count7 = count7 + 1;
+                                Letters{i,j}{count7,1} = SP{i,j}{1,run};
+                            end
+                        end
+                    end
+                end
+            end
         end
     end
-    trial{jj} = trial_no;
 end
 
-% for l = 1:length(ses)
-%     trial{1,l} = padarray(trial{1,l},(length(Data{1,1}{ses(l)+1,1}) - length(trial{1,l})),'post');
-% end
+save ('Circle','Circle'); save ('Lines','Lines'); save ('Ellipses','Ellipses'); 
+save ('Spiral','Spiral'); save ('Blobs','Blobs'); save ('Squiggles','Squiggles');
+save ('Letters','Letters')
 
-figure(3);
-for i = 1: length(ses)
-    subplot(2,2,i)
-    for j = 1:length(Data_SP_40{1,1}{ses(i)+1,2})
-        check = ismember(Data_SP_40{1,1}{ses(i)+1,2}(j).trial,trial{1,i});
-        if check == 1
-            plot(j , Data_SP_40{1,1}{ses(i)+1,2}(j).inducers, '.k', 'MarkerSize', 15)
-            %             a = get(gca,'Children');
-            hold on;
+%% Isolating Orientation Jitter Thresholds for each shape
+
+% Circle 
+clear all
+load('Circle.mat')
+
+for ii = 1:size(Circle,1)
+    for jj = 1:size(Circle,2)
+        if isempty(Circle{ii,jj}) == 1
+            avg_thresh_ori = NaN;
+            Thresh_ori = NaN;
         else
-            plot(j , Data_SP_40{1,1}{ses(i)+1,2}(j).inducers, '.r', 'MarkerSize', 15)
-            %             b = get(gca,'Children');
-            hold on;
+            for kk = 1:length(Circle{ii,jj})
+                count_ori = [];
+                for mm = 4:length(Circle{ii,jj}{kk,1})                   
+                    count_ori = [count_ori ; Circle{ii,jj}{kk,1}(mm,1).orientationJitter];
+                end
+                thresh_ori = [];
+                flag_ori = 0;
+                for ll = 1:length(count_ori) - 1
+                    c = 0;
+                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 1;
+                    end
+                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 0;
+                    end
+                end
+                avg_thresh_ori = mean(thresh_ori,'omitnan');
+                Thresh_ori(kk,1) = avg_thresh_ori;
+                clear count_ori
+            end
         end
+        Circle_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
+        clear avg_thresh_ori; clear Thresh_ori;
     end
-    %     h = [a;b]
-    title(['Inducers - Session ' num2str(ses(i)+1) ], 'fontsize', 14)
-    xlabel('Trials per session')
-    ylabel('Inducer (count)')
-    % legend(h,'Correct Trials','Error Trials','location','southeast');
 end
 
+save('Circle_OJ_thresh','Circle_OJ_thresh');
+clear all
 
-sgtitle('Individual Tracks for SP - 01', 'fontsize', 25)
+% Lines 
+clear all
+load('Lines.mat')
+
+for ii = 1:size(Lines,1)
+    for jj = 1:size(Lines,2)
+        if isempty(Lines{ii,jj}) == 1
+            avg_thresh_ori = NaN;
+            Thresh_ori = NaN;
+        else
+            for kk = 1:length(Lines{ii,jj})
+                count_ori = [];
+                for mm = 4:length(Lines{ii,jj}{kk,1})                   
+                    count_ori = [count_ori ; Lines{ii,jj}{kk,1}(mm,1).orientationJitter];
+                end
+                thresh_ori = [];
+                flag_ori = 0;
+                for ll = 1:length(count_ori) - 1
+                    c = 0;
+                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 1;
+                    end
+                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 0;
+                    end
+                end
+                avg_thresh_ori = mean(thresh_ori,'omitnan');
+                Thresh_ori(kk,1) = avg_thresh_ori;
+                clear count_ori
+            end
+        end
+        Lines_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
+        clear avg_thresh_ori; clear Thresh_ori;
+    end
+end
+
+save('Lines_OJ_thresh','Lines_OJ_thresh');
+clear all
+
+% Ellipses 
+clear all
+load('Ellipses.mat')
+
+for ii = 1:size(Ellipses,1)
+    for jj = 1:size(Ellipses,2)
+        if isempty(Ellipses{ii,jj}) == 1
+            avg_thresh_ori = NaN;
+            Thresh_ori = NaN;
+        else
+            for kk = 1:length(Ellipses{ii,jj})
+                count_ori = [];
+                for mm = 4:length(Ellipses{ii,jj}{kk,1})                   
+                    count_ori = [count_ori ; Ellipses{ii,jj}{kk,1}(mm,1).orientationJitter];
+                end
+                thresh_ori = [];
+                flag_ori = 0;
+                for ll = 1:length(count_ori) - 1
+                    c = 0;
+                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 1;
+                    end
+                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 0;
+                    end
+                end
+                avg_thresh_ori = mean(thresh_ori,'omitnan');
+                Thresh_ori(kk,1) = avg_thresh_ori;
+                clear count_ori
+            end
+        end
+        Ellipses_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
+        clear avg_thresh_ori; clear Thresh_ori;
+    end
+end
+
+save('Ellipses_OJ_thresh','Ellipses_OJ_thresh');
+clear all
+
+% Spiral 
+clear all
+load('Spiral.mat')
+
+for ii = 1:size(Spiral,1)
+    for jj = 1:size(Spiral,2)
+        if isempty(Spiral{ii,jj}) == 1
+            avg_thresh_ori = NaN;
+            Thresh_ori = NaN;
+        else
+            for kk = 1:length(Spiral{ii,jj})
+                count_ori = [];
+                for mm = 4:length(Spiral{ii,jj}{kk,1})                   
+                    count_ori = [count_ori ; Spiral{ii,jj}{kk,1}(mm,1).orientationJitter];
+                end
+                thresh_ori = [];
+                flag_ori = 0;
+                for ll = 1:length(count_ori) - 1
+                    c = 0;
+                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 1;
+                    end
+                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 0;
+                    end
+                end
+                avg_thresh_ori = mean(thresh_ori,'omitnan');
+                Thresh_ori(kk,1) = avg_thresh_ori;
+                clear count_ori
+            end
+        end
+        Spiral_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
+        clear avg_thresh_ori; clear Thresh_ori;
+    end
+end
+
+save('Spiral_OJ_thresh','Spiral_OJ_thresh');
+clear all
+
+% Blobs 
+clear all
+load('Blobs.mat')
+
+for ii = 1:size(Blobs,1)
+    for jj = 1:size(Blobs,2)
+        if isempty(Blobs{ii,jj}) == 1
+            avg_thresh_ori = NaN;
+            Thresh_ori = NaN;
+        else
+            for kk = 1:length(Blobs{ii,jj})
+                count_ori = [];
+                for mm = 4:length(Blobs{ii,jj}{kk,1})                   
+                    count_ori = [count_ori ; Blobs{ii,jj}{kk,1}(mm,1).orientationJitter];
+                end
+                thresh_ori = [];
+                flag_ori = 0;
+                for ll = 1:length(count_ori) - 1
+                    c = 0;
+                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 1;
+                    end
+                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 0;
+                    end
+                end
+                avg_thresh_ori = mean(thresh_ori,'omitnan');
+                Thresh_ori(kk,1) = avg_thresh_ori;
+                clear count_ori
+            end
+        end
+        Blobs_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
+        clear avg_thresh_ori; clear Thresh_ori;
+    end
+end
+
+save('Blobs_OJ_thresh','Blobs_OJ_thresh');
+clear all
+
+% Squiggles
+clear all
+load('Squiggles.mat')
+
+for ii = 1:size(Squiggles,1)
+    for jj = 1:size(Squiggles,2)
+        if isempty(Squiggles{ii,jj}) == 1
+            avg_thresh_ori = NaN;
+            Thresh_ori = NaN;
+        else
+            for kk = 1:length(Squiggles{ii,jj})
+                count_ori = [];
+                for mm = 4:length(Squiggles{ii,jj}{kk,1})                   
+                    count_ori = [count_ori ; Squiggles{ii,jj}{kk,1}(mm,1).orientationJitter];
+                end
+                thresh_ori = [];
+                flag_ori = 0;
+                for ll = 1:length(count_ori) - 1
+                    c = 0;
+                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 1;
+                    end
+                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 0;
+                    end
+                end
+                avg_thresh_ori = mean(thresh_ori,'omitnan');
+                Thresh_ori(kk,1) = avg_thresh_ori;
+                clear count_ori
+            end
+        end
+        Squiggles_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
+        clear avg_thresh_ori; clear Thresh_ori;
+    end
+end
+
+save('Squiggles_OJ_thresh','Squiggles_OJ_thresh');
+clear all
+
+% Letters
+clear all
+load('Letters.mat')
+
+for ii = 1:size(Letters,1)
+    for jj = 1:size(Letters,2)
+        if isempty(Letters{ii,jj}) == 1
+            avg_thresh_ori = NaN;
+            Thresh_ori = NaN;
+        else
+            for kk = 1:length(Letters{ii,jj})
+                count_ori = [];
+                for mm = 4:length(Letters{ii,jj}{kk,1})                   
+                    count_ori = [count_ori ; Letters{ii,jj}{kk,1}(mm,1).orientationJitter];
+                end
+                thresh_ori = [];
+                flag_ori = 0;
+                for ll = 1:length(count_ori) - 1
+                    c = 0;
+                    if count_ori(ll+1) < count_ori(ll) && flag_ori == 0
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 1;
+                    end
+                    if count_ori(ll+1) > count_ori(ll) && flag_ori == 1
+                        thresh_ori = [thresh_ori ; count_ori(ll)];
+                        flag_ori = 0;
+                    end
+                end
+                avg_thresh_ori = mean(thresh_ori,'omitnan');
+                Thresh_ori(kk,1) = avg_thresh_ori;
+                clear count_ori
+            end
+        end
+        Letters_OJ_thresh(ii,jj) = mean(Thresh_ori,'omitnan');
+        clear avg_thresh_ori; clear Thresh_ori;
+    end
+end
+
+save('Letters_OJ_thresh','Letters_OJ_thresh');
+clear all
+
+%% Calculating the average performance for a Contour Shape - Orientation Jitter
+
+% Circle
+
+load('Circle_OJ_thresh.mat');
+Circle_OJ_pmeans = nanmean(Circle_OJ_thresh,2); %participant means over 40 sessions
+Circle_OJ_thresh_final = nanmean(Circle_OJ_pmeans);
+% Within subject SE
+Circle_win_se_val = Circle_OJ_pmeans - Circle_OJ_thresh_final;
+Circle_win_sd = nanstd(Circle_win_se_val);
+Circle_OJ_win_se = Circle_win_sd./(size(Circle_OJ_pmeans(~isnan(Circle_OJ_pmeans)),1) ^ (1/2));
+Circle_SP = [Circle_OJ_pmeans; Circle_OJ_thresh_final;Circle_OJ_win_se];
+
+% Lines
+
+load('Lines_OJ_thresh.mat');
+Lines_OJ_pmeans = nanmean(Lines_OJ_thresh,2); %participant means over 40 sessions
+Lines_OJ_thresh_final = nanmean(Lines_OJ_pmeans);
+% Within subject SE
+Lines_win_se_val = Lines_OJ_pmeans - Lines_OJ_thresh_final;
+Lines_win_sd = nanstd(Lines_win_se_val);
+Lines_OJ_win_se = Lines_win_sd./(size(Lines_OJ_pmeans(~isnan(Lines_OJ_pmeans)),1) ^ (1/2));
+Lines_SP = [Lines_OJ_pmeans; Lines_OJ_thresh_final;Lines_OJ_win_se];
+
+% Ellipses
+
+load('Ellipses_OJ_thresh.mat'); 
+Ellipses_OJ_pmeans = nanmean(Ellipses_OJ_thresh,2); %participant means over 40 sessions
+Ellipses_OJ_thresh_final = nanmean(Ellipses_OJ_pmeans);
+% Within subject SE
+Ellipses_win_se_val = Ellipses_OJ_pmeans - Ellipses_OJ_thresh_final;
+Ellipses_win_sd = nanstd(Ellipses_win_se_val);
+Ellipses_OJ_win_se = Ellipses_win_sd./(size(Ellipses_OJ_pmeans(~isnan(Ellipses_OJ_pmeans)),1) ^ (1/2));
+Ellipses_SP = [Ellipses_OJ_pmeans; Ellipses_OJ_thresh_final;Ellipses_OJ_win_se];
+
+% Spiral
+
+load('Spiral_OJ_thresh.mat');
+Spiral_OJ_pmeans = nanmean(Spiral_OJ_thresh,2); %participant means over 40 sessions
+Spiral_OJ_thresh_final = nanmean(Spiral_OJ_pmeans);
+% Within subject SE
+Spiral_win_se_val = Spiral_OJ_pmeans - Spiral_OJ_thresh_final;
+Spiral_win_sd = nanstd(Spiral_win_se_val);
+Spiral_OJ_win_se = Spiral_win_sd./(size(Spiral_OJ_pmeans(~isnan(Spiral_OJ_pmeans)),1) ^ (1/2));
+Spiral_SP = [Spiral_OJ_pmeans; Spiral_OJ_thresh_final;Spiral_OJ_win_se];
+
+% Blobs
+
+load('Blobs_OJ_thresh.mat');
+Blobs_OJ_pmeans = nanmean(Blobs_OJ_thresh,2); %participant means over 40 sessions
+Blobs_OJ_thresh_final = nanmean(Blobs_OJ_pmeans);
+% Within subject SE
+Blobs_win_se_val = Blobs_OJ_pmeans - Blobs_OJ_thresh_final;
+Blobs_win_sd = nanstd(Blobs_win_se_val);
+Blobs_OJ_win_se = Blobs_win_sd./(size(Blobs_OJ_pmeans(~isnan(Blobs_OJ_pmeans)),1) ^ (1/2));
+Blobs_SP = [Blobs_OJ_pmeans; Blobs_OJ_thresh_final;Blobs_OJ_win_se];
+
+% Squiggles
+
+load('Squiggles_OJ_thresh.mat'); 
+Squiggles_OJ_pmeans = nanmean(Squiggles_OJ_thresh,2); %participant means over 40 sessions
+Squiggles_OJ_thresh_final = nanmean(Squiggles_OJ_pmeans);
+% Within subject SE
+Squiggles_win_se_val = Squiggles_OJ_pmeans - Squiggles_OJ_thresh_final;
+Squiggles_win_sd = nanstd(Squiggles_win_se_val);
+Squiggles_OJ_win_se = Squiggles_win_sd./(size(Squiggles_OJ_pmeans(~isnan(Squiggles_OJ_pmeans)),1) ^ (1/2));
+Squiggles_SP = [Squiggles_OJ_pmeans; Squiggles_OJ_thresh_final;Squiggles_OJ_win_se];
+
+% Letters
+
+load('Letters_OJ_thresh.mat');
+Letters_OJ_pmeans = nanmean(Letters_OJ_thresh,2); %participant means over 40 sessions
+Letters_OJ_thresh_final = nanmean(Letters_OJ_pmeans);
+% Within subject SE
+Letters_win_se_val = Letters_OJ_pmeans - Letters_OJ_thresh_final;
+Letters_win_sd = nanstd(Letters_win_se_val);
+Letters_OJ_win_se = Letters_win_sd./(size(Letters_OJ_pmeans(~isnan(Letters_OJ_pmeans)),1) ^ (1/2));
+Letters_SP = [Letters_OJ_pmeans; Letters_OJ_thresh_final;Letters_OJ_win_se];
+
+%% Creating .csv files for OJ thresholds for SP
+load('Circle_NT.mat');load('Lines_NT.mat');load('Ellipses_NT.mat');load('Spiral_NT.mat');
+load('Blobs_NT.mat');load('Squiggles_NT.mat');load('Letters_NT.mat');
+
+Shapes = ["Circle";"Lines";"Ellipses";"Spiral";"Blobs";"Squiggles";"Letters";...
+    "Circle";"Lines";"Ellipses";"Spiral";"Blobs";"Squiggles";"Letters"];
+
+Mean = [Circle_SP(4,1);Lines_SP(4,1);Ellipses_SP(4,1);Spiral_SP(4,1)...
+    ;Blobs_SP(4,1);Squiggles_SP(4,1);Letters_SP(4,1);...
+    Circle_NT(4,1);Lines_NT(4,1);Ellipses_NT(4,1);Spiral_NT(4,1)...
+    ;Blobs_NT(4,1);Squiggles_NT(4,1);Letters_NT(4,1)];
+
+SE = [Circle_SP(5,1);Lines_SP(5,1);Ellipses_SP(5,1);Spiral_SP(5,1)...
+    ;Blobs_SP(5,1);Squiggles_SP(5,1);Letters_SP(5,1);...
+    Circle_NT(5,1);Lines_NT(5,1);Ellipses_NT(5,1);Spiral_NT(5,1)...
+    ;Blobs_NT(5,1);Squiggles_NT(5,1);Letters_NT(5,1)];
+
+Group = ["SP";"SP";"SP";"SP";"SP";"SP";"SP";"NT";"NT";"NT";"NT";"NT";"NT";"NT"];
+OJ = table(Group,Shapes,Mean,SE);
+writetable(OJ,'OJ.csv');
