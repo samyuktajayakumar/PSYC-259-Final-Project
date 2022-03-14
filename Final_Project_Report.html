@@ -385,17 +385,19 @@ end</code></pre>
 </div>
 <div id="step-4-identifying-orientation-jitter-thresholds" class="section level3">
 <h3>Step 4: Identifying Orientation Jitter Thresholds</h3>
-<p>As stated previously, two variables of interest needs to be isolated for each participant across all sessions for each Contour shape. The first parameter is the <code>Orientation Jitter threshold</code> which is the maximum tolerable deviation in the orientation of the individual elements that make up the shape. Following is the code used to isolate the <code>OJ Threshold</code> for all SP participants and all sessions for each contour shape. The code block shows an example of how to isolate the OJ threshold for the <code>Circle</code> shape</p>
-<pre><code>for ii = 1:size(Circle,1)
-    for jj = 1:size(Circle,2)
-        if isempty(Circle{ii,jj}) == 1
+<p>As stated previously, two variables of interest needs to be isolated for each participant across all sessions for each Contour shape. The first parameter is the <code>Orientation Jitter threshold</code> which is the maximum tolerable deviation in the orientation of the individual elements that make up the shape. Following is the code used to isolate the <code>OJ Threshold</code> for all SP participants and all sessions for each contour shape. This is written as a <code>customized function</code> in MATLAB for optimizing the code to function with inputs from different shapes and groups.</p>
+<pre><code>function [Threshold] = isolate_threshold(input_mat)
+
+for ii = 1:size(input_mat,1)
+    for jj = 1:size(input_mat,2)
+        if isempty(input_mat{ii,jj}) == 1
             avg_thresh_ori = NaN;
             Thresh_ori = NaN;
         else
-            for kk = 1:length(Circle{ii,jj})
+            for kk = 1:length(input_mat{ii,jj})
                 count_ori = [];
-                for mm = 4:length(Circle{ii,jj}{kk,1})                   
-                    count_ori = [count_ori ; Circle{ii,jj}{kk,1}(mm,1).orientationJitter];
+                for mm = 4:length(input_mat{ii,jj}{kk,1})                   
+                    count_ori = [count_ori ; input_mat{ii,jj}{kk,1}(mm,1).orientationJitter];
                 end
                 thresh_ori = [];
                 flag_ori = 0;
@@ -415,12 +417,10 @@ end</code></pre>
                 clear count_ori
             end
         end
-        Circle_thresh(ii,jj) = mean(Thresh_ori,&#39;omitnan&#39;);
+        Threshold(ii,jj) = mean(Thresh_ori,&#39;omitnan&#39;);
         clear avg_thresh_ori; clear Thresh_ori;
     end
-end
-
-save(&#39;Circle_OJ_thresh&#39;,&#39;Circle_thresh&#39;);</code></pre>
+end</code></pre>
 <p>This was repeated for all Contour shapes. Once the thresholds were isolated, I calculated the average threshold for each shape by taking the average of all participants over all sessions and estimated the within subject standard error as follows for each shape. Following is an example for the <code>Circle</code> contour shape.</p>
 <pre><code>Circle_OJ_pmeans = nanmean(Circle_OJ_thresh,2); %participant means over 40 sessions
 Circle_OJ_thresh_final = nanmean(Circle_OJ_pmeans);
